@@ -1,3 +1,11 @@
+#|
+CL-TEST-MORE - Yet Another Unit Testing Framework for Common Lisp
+URL: http://github.com/fukamachi/cl-test-more
+Copyright (c) 2010 Eitarow Fukamachi <e.arrows@gmail.com>
+
+CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).
+|#
+
 (in-package :cl-user)
 
 (defpackage cl-test-more

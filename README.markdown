@@ -1,4 +1,4 @@
-# CL-TEST-MORE - Yet Another Test Framework for Common Lisp
+# CL-TEST-MORE - Yet Another Unit Testing Framework for Common Lisp
 
 CL-TEST-MORE is inspired by Test::More, a module of Perl.
 
@@ -31,7 +31,7 @@ Other implementations will be supported soon.
     (is got expected "Description")
     (isnt got expected "Description")
     
-    ;; rather than print \*standard-output\* "# This is just a comment\\n"
+    ;; rather than print *standard-output* "# This is just a comment\n"
     (diag "This is just a comment")
     
     ;; macro expansion
@@ -58,5 +58,5 @@ Other implementations will be supported soon.
 
 ## License
 
-Copyright (c) 2010 深町英太郎 (E.Fukamachi)  
-Licensed under the MIT License (http://www.opensource.org/licenses/mit-license)
+Copyright (c) 2010 Eitarow Fukamachi <e.arrows@gmail.com>  
+CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).

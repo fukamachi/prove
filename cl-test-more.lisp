@@ -34,6 +34,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 #+allegro (pushnew '(funcall #'finalize) sys:*exit-cleanup-forms*)
 #+sbcl (pushnew #'finalize sb-ext:*exit-hooks*)
+#+ecl (pushnew #'finalize si:*exit-hooks*)
 
 (defun test (got expected desc &key notp)
   (incf *counter*)

@@ -32,7 +32,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     (format t "# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
   (setf *counter* 0 *failed* 0))
 
-(pushnew #'finalize sb-ext:*exit-hooks*)
+#+allegro (pushnew '(funcall #'finalize) sys:*exit-cleanup-forms*)
+#+sbcl (pushnew #'finalize sb-ext:*exit-hooks*)
 
 (defun test (got expected desc &key notp)
   (incf *counter*)

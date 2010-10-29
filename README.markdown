@@ -10,7 +10,7 @@ The advantages of CL-TEST-MORE are:
 
 ## Dependencies
 
-CL-TEST-MORE only works on [Allegro CL](http://www.franz.com/products/allegrocl/), [SBCL](http://www.sbcl.org/) and [ECL](http://ecls.sourceforge.net/) now.  
+CL-TEST-MORE only works on [Allegro CL](http://www.franz.com/products/allegrocl/), [SBCL](http://www.sbcl.org/), [CMUCL](http://www.cons.org/cmucl/) and [ECL](http://ecls.sourceforge.net/) now.  
 Other implementations will be supported soon.
 
 ## Synopsis

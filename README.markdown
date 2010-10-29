@@ -50,6 +50,24 @@ Other implementations will be supported soon.
     (require 'asdf-install)
     (asdf-install:install "http://github.com/fukamachi/cl-test-more/tarball/master")
 
+## How to run tests
+
+### Allegro CL
+
+    $ alisp -#! filename.lisp
+
+### SBCL
+
+    $ sbcl --script filename.lisp
+
+### CMUCL
+
+    $ cmucl -load filename.lisp -eval '(quit)'
+
+### ECL
+
+    $ ecl -shell filename.lisp
+
 ## TODO
 
 * Enable to pass a function to test

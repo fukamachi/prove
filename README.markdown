@@ -10,7 +10,7 @@ The advantages of CL-TEST-MORE are:
 
 ## Dependencies
 
-CL-TEST-MORE only works on [Allegro CL](http://www.franz.com/products/allegrocl/), [SBCL](http://www.sbcl.org/), [CMUCL](http://www.cons.org/cmucl/) and [ECL](http://ecls.sourceforge.net/) now.  
+CL-TEST-MORE only works on [Allegro CL](http://www.franz.com/products/allegrocl/), [SBCL](http://www.sbcl.org/), [CMUCL](http://www.cons.org/cmucl/), [Clozure CL](http://www.clozure.com/clozurecl.html) and [ECL](http://ecls.sourceforge.net/) now.  
 Other implementations will be supported soon.
 
 ## Synopsis
@@ -63,6 +63,10 @@ Other implementations will be supported soon.
 ### CMUCL
 
     $ cmucl -load filename.lisp -eval '(quit)'
+
+### Clozure CL
+
+    $ ccl --load filename.lisp --eval '(quit)'
 
 ### ECL
 

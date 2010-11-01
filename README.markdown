@@ -6,11 +6,14 @@ The advantages of CL-TEST-MORE are:
 
 * Just one file to load
 * Test with just simple functions
+* Test as a script
 * Results format is "Test Anything Protocol"
 
 ## Dependencies
 
-CL-TEST-MORE only works on Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.
+CL-TEST-MORE is almost written in portable Common Lisp code.  
+But, a feature, tests as a script is only supported Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.  
+If you use other implementation, you have to put <code>(finalize)</code> at the end of file.
 
 ## Synopsis
 
@@ -26,9 +29,10 @@ CL-TEST-MORE only works on Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.
     (ok (eq got expected) "Description")
     
     ;; check if "got" equals "expected"
-    ;; test with `equal'
     (is got expected "Description")
     (isnt got expected "Description")
+    ;; with :test function
+    (is got expected "Description" :test #'string=)
     
     ;; rather than print *standard-output* "# This is just a comment\n"
     (diag "This is just a comment")
@@ -75,12 +79,11 @@ CL-TEST-MORE only works on Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.
 
     $ clisp filename.lisp
 
-## TODO
+## Bugs
 
-* Enable to pass a function to test
-* Make a description optional
+Please report any bugs to e.arrows@gmail.com, or post an issue to [GitHub](http://github.com/fukamachi/cl-test-more/issues).
 
 ## License
 
-Copyright (c) 2010 Eitarow Fukamachi <e.arrows@gmail.com>  
+Copyright (c) 2010 Eitarow Fukamachi &lt;e.arrows@gmail.com&gt;  
 CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).

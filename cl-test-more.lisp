@@ -37,6 +37,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 #+cmu (pushnew #'finalize lisp::*cleanup-functions*)
 #+ccl (pushnew #'finalize ccl:*lisp-cleanup-functions*)
 #+ecl (pushnew #'finalize si:*exit-hooks*)
+#+clisp (pushnew #'finalize custom:*fini-hooks*)
 
 (defun test (got expected desc &key notp)
   (incf *counter*)

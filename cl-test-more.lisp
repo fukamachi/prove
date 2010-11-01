@@ -11,13 +11,15 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defpackage cl-test-more
   (:nicknames :test)
   (:use :cl)
-  (:export :ok :is :isnt :diag :is-expand :is-print :plan :pass :fail))
+  (:export :ok :is :isnt :diag :is-expand :is-print :plan :pass :fail
+           :*default-test-function*))
 
 (in-package :cl-test-more)
 
 (defvar *plan* nil)
 (defvar *counter* 0)
 (defvar *failed* 0)
+(defvar *default-test-function* #'equal)
 
 (defun plan (num)
   (setf *plan* num)
@@ -64,7 +66,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defun test (got expected args &key notp)
   (incf *counter*)
   (multiple-value-bind (desc test) (parse-description-and-test args)
-    (let* ((res (funcall (or test #'equal) got expected))
+    (let* ((res (funcall (or test *default-test-function*) got expected))
            (res (if notp (not res) res)))
       (format t "~:[not ~;~]ok ~a~:[~;~:* - ~a~]~:[~;~:* # test with ~a~]~%" res *counter* desc (function-name test))
       (when (not res)

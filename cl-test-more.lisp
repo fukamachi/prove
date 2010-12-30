@@ -12,6 +12,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (:nicknames :test)
   (:use :cl)
   (:export :ok :is :isnt :diag :is-expand :is-print :plan :pass :fail
+           :deftest :run-test :run-test-all
            :*default-test-function*))
 
 (in-package :cl-test-more)
@@ -20,26 +21,39 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defvar *counter* 0)
 (defvar *failed* 0)
 (defvar *default-test-function* #'equal)
+(defvar *tests* nil)
 
 (defun plan (num)
   (setf *plan* num)
   (format t "1..~a~%" num))
 
 (defun finalize ()
+  (format t "~&~%")
   (unless *plan*
     (write-line "# Tests were run but no plan was declared."))
   (when (and *plan* (not (= *counter* *plan*)))
     (format t "# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*))
   (when *failed*
     (format t "# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
-  (setf *counter* 0 *failed* 0))
+  (setf *plan* 0 *counter* 0 *failed* 0))
 
-#+allegro (pushnew '(funcall #'finalize) sys:*exit-cleanup-forms*)
-#+sbcl (pushnew #'finalize sb-ext:*exit-hooks*)
-#+cmu (pushnew #'finalize lisp::*cleanup-functions*)
-#+ccl (pushnew #'finalize ccl:*lisp-cleanup-functions*)
-#+ecl (pushnew #'finalize si:*exit-hooks*)
-#+clisp (pushnew #'finalize custom:*fini-hooks*)
+(defun add-exit-hook ()
+  #+allegro (pushnew '(funcall #'run-test-all) sys:*exit-cleanup-forms*)
+  #+sbcl (pushnew #'run-test-all sb-ext:*exit-hooks*)
+  #+cmu (pushnew #'run-test-all lisp::*cleanup-functions*)
+  #+ccl (pushnew #'run-test-all ccl:*lisp-cleanup-functions*)
+  #+ecl (pushnew #'run-test-all si:*exit-hooks*)
+  #+clisp (pushnew #'run-test-all custom:*fini-hooks*))
+
+(defun remove-exit-hook ()
+  (macrolet ((delete! (item seq)
+               `(setf ,seq (delete ,item ,seq :test #'equal))))
+    #+allegro (delete! '(funcall #'run-test-all) sys:*exit-cleanup-forms*)
+    #+sbcl (delete! #'run-test-all sb-ext:*exit-hooks*)
+    #+cmu (delete! #'run-test-all lisp::*cleanup-functions*)
+    #+ccl (delete! #'run-test-all ccl:*lisp-cleanup-functions*)
+    #+ecl (delete! #'run-test-all si:*exit-hooks*)
+    #+clisp (delete! #'run-test-all custom:*fini-hooks*)))
 
 (defun parse-description-and-test (args)
   (if (consp args)
@@ -104,3 +118,21 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defun fail (desc &rest args)
   (test t nil (apply #'format nil desc args)))
+
+(defmacro deftest (name &rest test-forms)
+  `(pushnew (cons ,(symbol-name name) (lambda () ,@test-forms)) *tests* :key #'car :test #'string=))
+
+(defun run-test (name &key continuep)
+  (format t "~&~%# Test: ~a~%" name)
+  (let ((test (assoc (symbol-name name) *tests* :test #'string=)))
+    (if test
+        (funcall (cdr test))
+        (error "Not found test: ~a" (car test))))
+  (or continuep (finalize))
+  (remove-exit-hook))
+
+(defun run-test-all ()
+  (map nil (lambda (test) (run-test (intern (car test)) :continuep t)) (reverse *tests*))
+  (finalize))
+
+(add-exit-hook)

@@ -119,12 +119,21 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defun fail (desc &rest args)
   (test t nil (apply #'format nil desc args)))
 
+(defun find-test (name)
+  (assoc (symbol-name name) *tests* :test #'string=))
+
 (defmacro deftest (name &rest test-forms)
-  `(pushnew (cons ,(symbol-name name) (lambda () ,@test-forms)) *tests* :key #'car :test #'string=))
+  (let ((test (gensym)))
+    `(let ((,test (find-test ',name)))
+       (if ,test
+           (rplacd ,test (lambda () ,@test-forms))
+           (push (cons ,(symbol-name name)
+                       (lambda () ,@test-forms))
+                 *tests*)))))
 
 (defun run-test (name &key continuep)
   (format t "~&~%# Test: ~a~%" name)
-  (let ((test (assoc (symbol-name name) *tests* :test #'string=)))
+  (let ((test (find-test name)))
     (if test
         (funcall (cdr test))
         (error "Not found test: ~a" (car test))))

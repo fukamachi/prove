@@ -58,7 +58,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defun parse-description-and-test (args)
   (if (consp args)
       (case (length args)
-        (1 args)
+        (1 (car args))
         (2 (if (eq :test (car args))
                (values nil (cadr args))
                (car args)))

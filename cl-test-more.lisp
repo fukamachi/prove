@@ -77,10 +77,10 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
         (declare (ignore lambda closurep))
         name)))
 
-(defun test (got expected args &key notp)
+(defun test (got expected args &key notp test)
   (incf *counter*)
-  (multiple-value-bind (desc test) (parse-description-and-test args)
-    (let* ((res (funcall (or test *default-test-function*) got expected))
+  (multiple-value-bind (desc arg-test) (parse-description-and-test args)
+    (let* ((res (funcall (or test arg-test *default-test-function*) got expected))
            (res (if notp (not res) res)))
       (format t "~:[not ~;~]ok ~a~:[~;~:* - ~a~]~:[~;~:* # test with ~a~]~%" res *counter* desc (function-name test))
       (when (not res)
@@ -104,7 +104,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defmacro is-expand (got expected &optional desc)
   (let ((expanded (gensym)))
     `(let ((,expanded (macroexpand-1 ',got)))
-       (or (test ,expanded ',expected ,desc)
+       (or (test ,expanded ',expected ,desc :test #'equal)
            (format t "#   got: ~S~%#   expanded: ~S~%#   expected: ~S~%"
                    ',got ,expanded ',expected)))))
 

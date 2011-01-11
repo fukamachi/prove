@@ -13,6 +13,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (:use :cl)
   (:export :ok :is :isnt :diag :is-expand :is-print :plan :pass :fail
            :deftest :run-test :run-test-all
+           :remove-test :remove-test-all
            :*default-test-function*))
 
 (in-package :cl-test-more)
@@ -131,17 +132,23 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                        (lambda () ,@test-forms))
                  *tests*)))))
 
-(defun run-test (name &key continuep)
+(defun run-test (name &key (finalizep t))
   (format t "~&~%# Test: ~a~%" name)
   (let ((test (find-test name)))
     (if test
         (funcall (cdr test))
         (error "Not found test: ~a" (car test))))
-  (or continuep (finalize))
+  (and finalizep (finalize))
   (remove-exit-hook))
 
 (defun run-test-all ()
-  (map nil (lambda (test) (run-test (intern (car test)) :continuep t)) (reverse *tests*))
+  (map nil (lambda (test) (run-test (intern (car test)) :finalizep nil)) (reverse *tests*))
   (finalize))
+
+(defun remove-test (name)
+  (setf *tests* (delete name *tests* :key #'car)))
+
+(defun remove-test-all ()
+  (setf *tests* nil))
 
 (add-exit-hook)

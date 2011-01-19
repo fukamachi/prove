@@ -116,13 +116,12 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
        (test ,res ,expected ,desc))))
 
 (defmacro is-error (form condition &optional desc)
-  `(test
-    (typep
-     (handler-case ,form
-       (condition (error) error))
-     ',condition)
-    t
-    ,desc))
+  (let ((err (gensym)))
+    `(let ((,err (handler-case ,form
+                   (condition (error) error))))
+       (or (test (typep ,err ',condition) t ,desc)
+           (format t "#   got: ~S~%#   expected error: ~S~%"
+                   ,err ',condition)))))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

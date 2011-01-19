@@ -11,10 +11,23 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defpackage cl-test-more
   (:nicknames :test)
   (:use :cl)
-  (:export :ok :is :isnt :diag :is-expand :is-print :is-error :plan :pass :fail
+  (:export :ok
+           :is
+           :isnt
+           :diag
+           :is-expand
+           :is-print
+           :is-error
+           :is-type
+           :plan
+           :pass
+           :fail
            :finalize
-           :deftest :run-test :run-test-all
-           :remove-test :remove-test-all
+           :deftest
+           :run-test
+           :run-test-all
+           :remove-test
+           :remove-test-all
            :*default-test-function*))
 
 (in-package :cl-test-more)
@@ -122,6 +135,9 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
        (or (test (typep ,err ',condition) t ,desc)
            (format t "#   got: ~S~%#   expected error: ~S~%"
                    ,err ',condition)))))
+
+(defun is-type (got expected-type &optional desc)
+  (test (typep got expected-type) t desc))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

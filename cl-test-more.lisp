@@ -137,7 +137,9 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                    ,err ',condition)))))
 
 (defun is-type (got expected-type &optional desc)
-  (test (typep got expected-type) t desc))
+  (or (test (typep got expected-type) t desc)
+      (format t "#   got: ~S~%#   expected type: ~S~%"
+              got expected-type)))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

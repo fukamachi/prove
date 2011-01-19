@@ -11,7 +11,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defpackage cl-test-more
   (:nicknames :test)
   (:use :cl)
-  (:export :ok :is :isnt :diag :is-expand :is-print :plan :pass :fail
+  (:export :ok :is :isnt :diag :is-expand :is-print :is-error :plan :pass :fail
+           :finalize
            :deftest :run-test :run-test-all
            :remove-test :remove-test-all
            :*default-test-function*))
@@ -113,6 +114,15 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (let ((res (gensym)))
     `(let ((,res (with-output-to-string (*standard-output*) ,got)))
        (test ,res ,expected ,desc))))
+
+(defmacro is-error (form condition &optional desc)
+  `(test
+    (typep
+     (handler-case ,form
+       (condition (error) error))
+     ',condition)
+    t
+    ,desc))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

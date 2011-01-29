@@ -19,6 +19,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            :is-print
            :is-error
            :is-type
+           :like
            :plan
            :pass
            :fail
@@ -140,6 +141,11 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (or (test (typep got expected-type) t desc)
       (format t "#   got: ~S~%#   expected type: ~S~%"
               got expected-type)))
+
+(defun like (got regex &optional desc)
+  (or (test (ppcre:scan regex got) 0 desc)
+      (format t "#   got: ~S~%#   like: ~S~%"
+              got regex)))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

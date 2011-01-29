@@ -21,6 +21,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            :is-type
            :like
            :plan
+           :skip
            :pass
            :fail
            :finalize
@@ -146,6 +147,12 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (or (test (ppcre:scan regex got) 0 desc)
       (format t "#   got: ~S~%#   like: ~S~%"
               got regex)))
+
+(defun skip (how-many why &rest args)
+  (dotimes (i (or how-many 1))
+    (incf *counter*)
+    (format t "ok ~A # skip~:[~;~:* ~A~]~%"
+            *counter* (apply #'format nil why args))))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

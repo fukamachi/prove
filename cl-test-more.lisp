@@ -33,7 +33,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (in-package :cl-test-more)
 
-(defvar *plan* nil)
+(defvar *plan* :unspecified)
 (defvar *counter* 0)
 (defvar *failed* 0)
 (defvar *default-test-function* #'equal)
@@ -41,11 +41,11 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defun plan (num)
   (setf *plan* num)
-  (format t "1..~a~%" num))
+  (when num (format t "1..~a~%" num)))
 
 (defun finalize ()
   (format t "~&~%")
-  (unless *plan*
+  (if (eq *plan* :unspecified)
     (write-line "# Tests were run but no plan was declared."))
   (when (and *plan* (not (= *counter* *plan*)))
     (format t "# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*))

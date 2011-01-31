@@ -10,7 +10,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defpackage cl-test-more
   (:nicknames :test)
-  (:use :cl)
+  (:use :cl :cl-ppcre)
   (:export :ok
            :is
            :isnt

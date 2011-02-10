@@ -144,9 +144,9 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
               got expected-type)))
 
 (defun like (got regex &optional desc)
-  (or (test (ppcre:scan regex got) 0 desc)
-      (format t "#   got: ~S~%#   like: ~S~%"
-              got regex)))
+  (or (test (numberp (ppcre:scan regex got)) t desc)
+      (format t "#   got: ~S~%#   like: ~S~% ~S~%"
+              got regex (ppcre:scan regex got))))
 
 (defun skip (how-many why &rest args)
   (dotimes (i (or how-many 1))

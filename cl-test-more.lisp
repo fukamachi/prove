@@ -46,13 +46,14 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defun finalize ()
   (format t "~&~%")
-  (if (eq *plan* :unspecified)
-    (write-line "# Tests were run but no plan was declared."))
-  (when (and *plan* (not (= *counter* *plan*)))
-    (format t "# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*))
+  (cond
+    ((eq *plan* :unspecified)
+     (write-line "# Tests were run but no plan was declared."))
+    ((not (= *counter* *plan*))
+     (format t "# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*)))
   (when (< 0 *failed*)
     (format t "# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
-  (setf *plan* 0 *counter* 0 *failed* 0))
+  (setf *plan* :unspecified *counter* 0 *failed* 0))
 
 (defun add-exit-hook ()
   #+allegro (pushnew '(funcall #'run-test-all) sys:*exit-cleanup-forms*)

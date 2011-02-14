@@ -49,7 +49,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (cond
     ((eq *plan* :unspecified)
      (write-line "# Tests were run but no plan was declared."))
-    ((not (= *counter* *plan*))
+    ((and *plan* (not (= *counter* *plan*)))
      (format t "# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*)))
   (when (< 0 *failed*)
     (format t "# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))

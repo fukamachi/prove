@@ -30,7 +30,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            :run-test-all
            :remove-test
            :remove-test-all
-           :*default-test-function*))
+           :*default-test-function*
+           :*gensym-prefix*))
 
 (in-package :cl-test-more)
 
@@ -39,6 +40,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defvar *failed* 0)
 (defvar *default-test-function* #'equal)
 (defvar *tests* nil)
+(defvar *gensym-alist* nil)
+(defvar *gensym-prefix* "$")
 
 (defun plan (num)
   (setf *plan* num)
@@ -119,10 +122,28 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defun diag (desc)
   (format t "# ~a~%" desc))
 
+(defun gensymp (val)
+  (and (symbolp val)
+       (string= (subseq (symbol-name val) 0 (length *gensym-prefix*)) *gensym-prefix*)))
+
+(defmethod gensym-tree-equal (x y)
+  (if (and (gensymp y) (symbolp x))
+      (if (assoc y *gensym-alist*)
+          (eq x (cdr (assoc y *gensym-alist*)))
+          (unless (rassoc x *gensym-alist*)
+            (setf *gensym-alist* `((,y . ,x) ,@*gensym-alist*))
+            t))
+      (equal x y)))
+
+(defmethod gensym-tree-equal ((x cons) (y cons))
+  (loop for a in x for b in y
+        always (gensym-tree-equal a b)))
+
 (defmacro is-expand (got expected &optional desc)
   (let ((expanded (gensym)))
-    `(let ((,expanded (macroexpand-1 ',got)))
-       (or (test ,expanded ',expected ,desc :test #'equal)
+    `(let ((,expanded (macroexpand-1 ',got))
+           *gensym-alist*)
+       (or (test ,expanded ',expected ,desc :test #'gensym-tree-equal)
            (format t "#   got: ~S~%#   expanded: ~S~%#   expected: ~S~%"
                    ',got ,expanded ',expected)))))
 

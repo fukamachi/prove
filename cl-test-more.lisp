@@ -45,17 +45,17 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defun plan (num)
   (setf *plan* num)
-  (when num (format t "1..~a~%" num)))
+  (when num (format t "~&1..~a~%" num)))
 
 (defun finalize ()
-  (format t "~&~%")
+  (format t "~2&")
   (cond
     ((eq *plan* :unspecified)
-     (write-line "# Tests were run but no plan was declared."))
+     (format t "~&# Tests were run but no plan was declared.~%"))
     ((and *plan* (not (= *counter* *plan*)))
-     (format t "# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*)))
+     (format t "~&# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*)))
   (when (< 0 *failed*)
-    (format t "# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
+    (format t "~&# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
   (setf *plan* :unspecified *counter* 0 *failed* 0))
 
 (defun add-exit-hook ()
@@ -103,7 +103,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (multiple-value-bind (desc arg-test) (parse-description-and-test args)
     (let* ((res (funcall (or test arg-test *default-test-function*) got expected))
            (res (if notp (not res) res)))
-      (format t "~:[not ~;~]ok ~a~:[~;~:* - ~a~]~:[~;~:* # test with ~a~]~%" res *counter* desc (function-name test))
+      (format t "~&~:[not ~;~]ok ~a~:[~;~:* - ~a~]~:[~;~:* # test with ~a~]~%" res *counter* desc (function-name test))
       (when (not res)
         (incf *failed*))
       res)))
@@ -113,14 +113,14 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defun is (got expected &rest args)
   (or (test got expected args)
-      (format t "#   got: ~S~%#   expected: ~S~%" got expected)))
+      (format t "~&#   got: ~S~%#   expected: ~S~%" got expected)))
 
 (defun isnt (got expected &rest args)
   (or (test got expected args :notp t)
-      (format t "#   got: ~S~%#   not expected: ~S~%" got expected)))
+      (format t "~&#   got: ~S~%#   not expected: ~S~%" got expected)))
 
 (defun diag (desc)
-  (format t "# ~a~%" desc))
+  (format t "~&# ~a~%" desc))
 
 (defun gensymp (val)
   (and (symbolp val)
@@ -144,7 +144,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     `(let ((,expanded (macroexpand-1 ',got))
            *gensym-alist*)
        (or (test ,expanded ',expected ,desc :test #'gensym-tree-equal)
-           (format t "#   got: ~S~%#   expanded: ~S~%#   expected: ~S~%"
+           (format t "~&#   got: ~S~%#   expanded: ~S~%#   expected: ~S~%"
                    ',got ,expanded ',expected)))))
 
 (defmacro is-print (got expected &optional desc)
@@ -157,23 +157,23 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     `(let ((,err (handler-case ,form
                    (condition (error) error))))
        (or (test (typep ,err ',condition) t ,desc)
-           (format t "#   got: ~S~%#   expected error: ~S~%"
+           (format t "~&#   got: ~S~%#   expected error: ~S~%"
                    ,err ',condition)))))
 
 (defun is-type (got expected-type &optional desc)
   (or (test (typep got expected-type) t desc)
-      (format t "#   got: ~S~%#   expected type: ~S~%"
+      (format t "~&#   got: ~S~%#   expected type: ~S~%"
               got expected-type)))
 
 (defun like (got regex &optional desc)
   (or (test (numberp (ppcre:scan regex got)) t desc)
-      (format t "#   got: ~S~%#   like: ~S~% ~S~%"
+      (format t "~&#   got: ~S~%#   like: ~S~% ~S~%"
               got regex (ppcre:scan regex got))))
 
 (defun skip (how-many why &rest args)
   (dotimes (i (or how-many 1))
     (incf *counter*)
-    (format t "ok ~A # skip~:[~;~:* ~A~]~%"
+    (format t "~&ok ~A # skip~:[~;~:* ~A~]~%"
             *counter* (apply #'format nil why args))))
 
 (defun pass (desc &rest args)
@@ -195,7 +195,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                  *tests*)))))
 
 (defun run-test (name &key (finalizep t))
-  (format t "~&~%# Test: ~a~%" name)
+  (format t "~2&# Test: ~a~%" name)
   (let ((test (find-test name)))
     (if test
         (funcall (cdr test))

@@ -9,20 +9,8 @@ The advantages of CL-TEST-MORE are:
 * Test as a script
 * Results format is "Test Anything Protocol"
 
-## Dependencies
-
-CL-TEST-MORE is almost written in portable Common Lisp code.  
-But, a feature, tests as a script is only supported Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.  
-If you use other implementation, you have to put <code>(finalize)</code> at the end of file.
-
 ## Synopsis
 
-    (require 'cl-test-more)
-    ;; or
-    (load "cl-test-more.lisp")
-    
-    (in-package :cl-test-more)
-    
     (plan 9)
     
     ;; check if first argument is true
@@ -46,14 +34,45 @@ If you use other implementation, you have to put <code>(finalize)</code> at the 
     ;; functions always pass or fail
     (pass "Description")
     (fail "Description")
+    
+    (finalize)
 
 ## Installation
 
-    (require 'asdf)
-    (require 'asdf-install)
+### Quicklisp
+
+    (ql:quickload :cl-test-more)
+
+### ASDF-Install
+
     (asdf-install:install "http://github.com/fukamachi/cl-test-more/tarball/master")
 
-## How to run tests
+## Functions
+
+* ok
+* is
+* isnt
+* diag
+* is-expand
+* is-print
+* is-error
+* is-type
+* like
+* skip
+* pass
+* fail
+
+* deftest
+* run-test
+* run-test-all
+
+## Change default test function
+
+## Test Macros
+
+## Change output stream
+
+## Run as a Script
 
 ### Allegro CL
 
@@ -78,6 +97,12 @@ If you use other implementation, you have to put <code>(finalize)</code> at the 
 ### CLISP
 
     $ clisp filename.lisp
+
+## Dependencies
+
+CL-TEST-MORE is almost written in portable Common Lisp code.  
+But, a feature, tests as a script is only supported Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.  
+If you use other implementation, you have to put <code>(finalize)</code> at the end of file.
 
 ## Bugs
 

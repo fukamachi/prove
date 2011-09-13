@@ -220,7 +220,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (finalize))
 
 (defun remove-test (name)
-  (setf *tests* (delete name *tests* :key #'car)))
+  (setf *tests* (delete name *tests* :key #'car :test #'string=)))
 
 (defun remove-test-all ()
   (setf *tests* nil))

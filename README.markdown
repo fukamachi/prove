@@ -6,7 +6,6 @@ The advantages of CL-TEST-MORE are:
 
 * Just one file to load
 * Test with just simple functions
-* Test as a script
 * Results format is "Test Anything Protocol"
 
 ## Synopsis
@@ -35,6 +34,7 @@ The advantages of CL-TEST-MORE are:
     (pass "Description")
     (fail "Description")
     
+    ;; Don't forget this
     (finalize)
 
 ## Installation
@@ -71,38 +71,6 @@ The advantages of CL-TEST-MORE are:
 ## Test Macros
 
 ## Change output stream
-
-## Run as a Script
-
-### Allegro CL
-
-    $ alisp -#! filename.lisp
-
-### SBCL
-
-    $ sbcl --script filename.lisp
-
-### CMUCL
-
-    $ cmucl -load filename.lisp -eval '(quit)'
-
-### Clozure CL
-
-    $ ccl --load filename.lisp --eval '(quit)'
-
-### ECL
-
-    $ ecl -shell filename.lisp
-
-### CLISP
-
-    $ clisp filename.lisp
-
-## Dependencies
-
-CL-TEST-MORE is almost written in portable Common Lisp code.  
-But, a feature, tests as a script is only supported Allegro CL, SBCL, CMUCL, Clozure CL, ECL and CLISP.  
-If you use other implementation, you have to put <code>(finalize)</code> at the end of file.
 
 ## Bugs
 

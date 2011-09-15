@@ -64,6 +64,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (setf *plan* :unspecified *counter* 0 *failed* 0))
 
 (defun add-exit-hook ()
+  "DEPRECATED!"
   #+allegro (pushnew '(funcall #'run-test-all) sys:*exit-cleanup-forms*)
   #+sbcl (pushnew #'run-test-all sb-ext:*exit-hooks*)
   #+cmu (pushnew #'run-test-all lisp::*cleanup-functions*)
@@ -72,6 +73,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   #+clisp (pushnew #'run-test-all custom:*fini-hooks*))
 
 (defun remove-exit-hook ()
+  "DEPRECATED!"
   (macrolet ((delete! (item seq)
                `(setf ,seq (delete ,item ,seq :test #'equal))))
     #+allegro (delete! '(funcall #'run-test-all) sys:*exit-cleanup-forms*)
@@ -212,8 +214,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     (if test
         (funcall (cdr test))
         (error "Not found test: ~a" (car test))))
-  (and finalizep (finalize))
-  (remove-exit-hook))
+  (and finalizep (finalize)))
 
 (defun run-test-all ()
   (map nil (lambda (test) (run-test (intern (car test)) :finalizep nil)) (reverse *tests*))
@@ -224,5 +225,3 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defun remove-test-all ()
   (setf *tests* nil))
-
-(add-exit-hook)

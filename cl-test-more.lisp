@@ -50,7 +50,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (when num (format *test-result-output* "~&1..~a~%" num)))
 
 (defun finalize ()
-  (format t "~2&")
+  (format *test-result-output* "~2&")
   (cond
     ((eq *plan* :unspecified)
      (format *test-result-output*

@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>CL-TEST-MORE by fukamachi</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>CL-TEST-MORE</h1>
+<p>Yet Another Unit Testing Framework for Common Lisp</p>
+        <p class="view"><a href="https://github.com/fukamachi/cl-test-more">View the Project on GitHub <small>fukamachi/cl-test-more</small></a></p>
+        <ul>
+          <li><a href="https://github.com/fukamachi/cl-test-more/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/fukamachi/cl-test-more/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/fukamachi/cl-test-more">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>CL-TEST-MORE is inspired by Test::More, a module of Perl.</p>
+
+<p>The advantages of CL-TEST-MORE are:</p>
+
+<ul>
+<li>Just one file to load</li>
+<li>Test with just simple functions</li>
+<li>Results format is "Test Anything Protocol"</li>
+</ul><h2>Synopsis</h2>
+
+<div class="highlight">
+<pre><span class="p">(</span><span class="nv">plan</span> <span class="mi">9</span><span class="p">)</span>
+
+<span class="c1">;; check if first argument is true</span>
+<span class="p">(</span><span class="nv">ok</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">got</span> <span class="nv">expected</span><span class="p">)</span> <span class="s">"Description"</span><span class="p">)</span>
+
+<span class="c1">;; check if "got" equals "expected"</span>
+<span class="p">(</span><span class="nv">is</span> <span class="nv">got</span> <span class="nv">expected</span> <span class="s">"Description"</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">isnt</span> <span class="nv">got</span> <span class="nv">expected</span> <span class="s">"Description"</span><span class="p">)</span>
+<span class="c1">;; with :test function</span>
+<span class="p">(</span><span class="nv">is</span> <span class="nv">got</span> <span class="nv">expected</span> <span class="s">"Description"</span> <span class="ss">:test</span> <span class="nf">#'</span><span class="nb">string=</span><span class="p">)</span>
+
+<span class="c1">;; rather than print *standard-output* "# This is just a comment\n"</span>
+<span class="p">(</span><span class="nv">diag</span> <span class="s">"This is just a comment"</span><span class="p">)</span>
+
+<span class="c1">;; macro expansion</span>
+<span class="p">(</span><span class="nv">is-expand</span> <span class="p">(</span><span class="nv">got</span> <span class="nv">macro</span><span class="p">)</span> <span class="p">(</span><span class="nv">expected</span> <span class="ss">:like</span> <span class="s">"this"</span><span class="p">)</span> <span class="s">"Description"</span><span class="p">)</span>
+
+<span class="c1">;; output</span>
+<span class="p">(</span><span class="nv">is-print</span> <span class="p">(</span><span class="nb">write-line</span> <span class="s">"aiueo"</span><span class="p">)</span> <span class="s">"aiueo\n"</span> <span class="s">"Description"</span><span class="p">)</span>
+
+<span class="c1">;; functions always pass or fail</span>
+<span class="p">(</span><span class="nv">pass</span> <span class="s">"Description"</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">fail</span> <span class="s">"Description"</span><span class="p">)</span>
+
+<span class="c1">;; Don't forget this</span>
+<span class="p">(</span><span class="nv">finalize</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<h2>Installation</h2>
+
+<h3>Quicklisp</h3>
+
+<div class="highlight">
+<pre><span class="p">(</span><span class="nv">ql:quickload</span> <span class="ss">:cl-test-more</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<h3>ASDF-Install</h3>
+
+<div class="highlight">
+<pre><span class="p">(</span><span class="nv">asdf-install:install</span> <span class="s">"<a href="http://github.com/fukamachi/cl-test-more/tarball/master">http://github.com/fukamachi/cl-test-more/tarball/master</a>"</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<h2>Functions</h2>
+
+<ul>
+<li>ok</li>
+<li>is</li>
+<li>isnt</li>
+<li>diag</li>
+<li>is-expand</li>
+<li>is-print</li>
+<li>is-error</li>
+<li>is-type</li>
+<li>like</li>
+<li>skip</li>
+<li>pass</li>
+<li><p>fail</p></li>
+<li><p>deftest</p></li>
+<li><p>run-test</p></li>
+<li><p>run-test-all</p></li>
+</ul><h2>Change default test function</h2>
+
+<h2>Test Macros</h2>
+
+<h2>Change output stream</h2>
+
+<h2>Bugs</h2>
+
+<p>Please report any bugs to e.arrows@gmail.com, or post an issue to <a href="http://github.com/fukamachi/cl-test-more/issues">GitHub</a>.</p>
+
+<h2>License</h2>
+
+<p>Copyright (c) 2010-2011 Eitarow Fukamachi &lt;e.arrows@gmail.com&gt;<br>
+CL-TEST-MORE is freely distributable under the MIT License (<a href="http://www.opensource.org/licenses/mit-license">http://www.opensource.org/licenses/mit-license</a>).</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/fukamachi">fukamachi</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>

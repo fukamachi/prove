@@ -10,42 +10,48 @@ The advantages of CL-TEST-MORE are:
 
 ## Synopsis
 
-    (plan 9)
-    
-    ;; check if first argument is true
-    (ok (eq got expected) "Description")
-    
-    ;; check if "got" equals "expected"
-    (is got expected "Description")
-    (isnt got expected "Description")
-    ;; with :test function
-    (is got expected "Description" :test #'string=)
-    
-    ;; rather than print *standard-output* "# This is just a comment\n"
-    (diag "This is just a comment")
-    
-    ;; macro expansion
-    (is-expand (got macro) (expected :like "this") "Description")
-    
-    ;; output
-    (is-print (write-line "aiueo") "aiueo\n" "Description")
-    
-    ;; functions always pass or fail
-    (pass "Description")
-    (fail "Description")
-    
-    ;; Don't forget this
-    (finalize)
+```common-lisp
+(plan 9)
+
+;; check if first argument is true
+(ok (eq got expected) "Description")
+
+;; check if "got" equals "expected"
+(is got expected "Description")
+(isnt got expected "Description")
+;; with :test function
+(is got expected "Description" :test #'string=)
+
+;; rather than print *standard-output* "# This is just a comment\n"
+(diag "This is just a comment")
+
+;; macro expansion
+(is-expand (got macro) (expected :like "this") "Description")
+
+;; output
+(is-print (write-line "aiueo") "aiueo\n" "Description")
+
+;; functions always pass or fail
+(pass "Description")
+(fail "Description")
+
+;; Don't forget this
+(finalize)
+```
 
 ## Installation
 
 ### Quicklisp
 
-    (ql:quickload :cl-test-more)
+```common-lisp
+(ql:quickload :cl-test-more)
+```
 
 ### ASDF-Install
 
-    (asdf-install:install "http://github.com/fukamachi/cl-test-more/tarball/master")
+```common-lisp
+(asdf-install:install "http://github.com/fukamachi/cl-test-more/tarball/master")
+```
 
 ## Functions
 

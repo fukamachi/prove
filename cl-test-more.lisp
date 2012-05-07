@@ -11,6 +11,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defpackage cl-test-more
   (:nicknames :test-more)
   (:use :cl :cl-ppcre)
+  (:shadow :format)
   (:export :ok
            :is
            :isnt
@@ -36,11 +37,24 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (in-package :cl-test-more)
 
+(defvar *indent-level* 0)
 (defvar *default-test-function* #'equal)
 (defvar *tests* nil)
 (defvar *gensym-alist* nil)
 (defvar *gensym-prefix* "$")
 (defvar *test-result-output* *standard-output*)
+
+(defun format (stream control-string &rest format-arguments)
+  (cond
+    ((eq stream *test-result-output*)
+     (cl:format stream
+      "~&~V@{ ~}~A"
+      (* 4 *indent-level*)
+      (ppcre:regex-replace "^\\n"
+       (apply #'cl:format nil control-string format-arguments)
+       "")))
+    (t
+     (apply #'cl:format stream control-string format-arguments))))
 
 (defmacro with-package-symbols (symbols &body body)
   `(symbol-macrolet (,@(loop for s in symbols
@@ -222,10 +236,11 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
               (with-package-symbols (*plan* *counter* *failed*)
                 (let (successp)
                   (progv
-                      `(,(intern (string :*plan*) *package*)
+                      `(*indent-level*
+                        ,(intern (string :*plan*) *package*)
                         ,(intern (string :*counter*) *package*)
                         ,(intern (string :*failed*) *package*))
-                      `(nil 0 0)
+                      `(,(1+ *indent-level*) nil 0 0)
                     ,@test-forms
                     (setf successp (finalize)))
                   (if successp

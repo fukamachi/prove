@@ -36,32 +36,43 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (in-package :cl-test-more)
 
-(defvar *plan* :unspecified)
-(defvar *counter* 0)
-(defvar *failed* 0)
 (defvar *default-test-function* #'equal)
 (defvar *tests* nil)
 (defvar *gensym-alist* nil)
 (defvar *gensym-prefix* "$")
 (defvar *test-result-output* *standard-output*)
 
+(defmacro with-package-symbols (symbols &body body)
+  `(symbol-macrolet (,@(loop for s in symbols
+                             collect
+                             (list (intern (symbol-name s) *package*) `(symbol-value (intern ,(symbol-name s) *package*)))))
+     ,@body))
+
 (defun plan (num)
-  (setf *plan* num)
+  (with-package-symbols (*plan* *counter* *failed*)
+    (setf *plan* num
+          *counter* 0
+          *failed* 0))
   (when num (format *test-result-output* "~&1..~a~%" num)))
 
 (defun finalize ()
-  (format *test-result-output* "~2&")
-  (cond
-    ((eq *plan* :unspecified)
-     (format *test-result-output*
-             "~&# Tests were run but no plan was declared.~%"))
-    ((and *plan* (not (= *counter* *plan*)))
-     (format *test-result-output*
-             "~&# Looks like you planned ~a tests but ran ~a.~%" *plan* *counter*)))
-  (when (< 0 *failed*)
-    (format *test-result-output*
-            "~&# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
-  (setf *plan* :unspecified *counter* 0 *failed* 0))
+  (with-package-symbols (*plan* *counter* *failed*)
+    (cond
+      ((eq :unspecified
+           (handler-case *plan*
+             (unbound-variable () :unspecified)))
+       (format *test-result-output*
+               "~&# Tests were run but no plan was declared.~%"))
+      ((and *plan*
+            (not (= *counter* *plan*)))
+       (format *test-result-output*
+               "~&# Looks like you planned ~a tests but ran ~a.~%"
+               *plan*
+               *counter*)))
+    (when (< 0 *failed*)
+      (format *test-result-output*
+              "~&# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
+    ))
 
 (defun add-exit-hook ()
   "DEPRECATED!"
@@ -106,16 +117,17 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
         name)))
 
 (defun test (got expected args &key notp test)
-  (incf *counter*)
-  (multiple-value-bind (desc arg-test) (parse-description-and-test args)
-    (let* ((res (funcall (or test arg-test *default-test-function*) got expected))
-           (res (if notp (not res) res)))
-      (format *test-result-output*
-              "~&~:[not ~;~]ok ~a~:[~;~:* - ~a~]~:[~;~:* # test with ~a~]~%"
-              res *counter* desc (function-name test))
-      (when (not res)
-        (incf *failed*))
-      res)))
+  (with-package-symbols (*counter* *failed*)
+    (incf *counter*)
+    (multiple-value-bind (desc arg-test) (parse-description-and-test args)
+      (let* ((res (funcall (or test arg-test *default-test-function*) got expected))
+             (res (if notp (not res) res)))
+        (format *test-result-output*
+                "~&~:[not ~;~]ok ~a~:[~;~:* - ~a~]~:[~;~:* # test with ~a~]~%"
+                res *counter* desc (function-name test))
+        (when (not res)
+          (incf *failed*))
+        res))))
 
 (defun ok (test &optional desc)
   (test (not (null test)) t desc))
@@ -184,11 +196,12 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
               got regex (ppcre:scan regex got))))
 
 (defun skip (how-many why &rest args)
-  (dotimes (i (or how-many 1))
-    (incf *counter*)
-    (format *test-result-output*
-            "~&ok ~A # skip~:[~;~:* ~A~]~%"
-            *counter* (apply #'format nil why args))))
+  (with-package-symbols (*counter*)
+    (dotimes (i (or how-many 1))
+      (incf *counter*)
+      (format *test-result-output*
+              "~&ok ~A # skip~:[~;~:* ~A~]~%"
+              *counter* (apply #'format nil why args)))))
 
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))

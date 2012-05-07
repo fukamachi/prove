@@ -72,7 +72,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     (when (< 0 *failed*)
       (format *test-result-output*
               "~&# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
-    ))
+
+    (= 0 *failed*)))
 
 (defun add-exit-hook ()
   "DEPRECATED!"
@@ -213,12 +214,27 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (assoc (symbol-name name) *tests* :test #'string=))
 
 (defmacro deftest (name &rest test-forms)
-  (let ((test (gensym)))
-    `(let ((,test (find-test ',name)))
+  (let ((test (gensym))
+        (test-fn (gensym)))
+    `(let ((,test (find-test ',name))
+           (,test-fn
+            (lambda ()
+              (with-package-symbols (*plan* *counter* *failed*)
+                (let (successp)
+                  (progv
+                      `(,(intern (string :*plan*) *package*)
+                        ,(intern (string :*counter*) *package*)
+                        ,(intern (string :*failed*) *package*))
+                      `(nil 0 0)
+                    ,@test-forms
+                    (setf successp (finalize)))
+                  (if successp
+                      (pass (string ',name))
+                      (fail (string ',name))))))))
        (if ,test
-           (rplacd ,test (lambda () ,@test-forms))
+           (rplacd ,test ,test-fn)
            (push (cons ,(symbol-name name)
-                       (lambda () ,@test-forms))
+                       ,test-fn)
                  *tests*)))))
 
 (defun run-test (name &key (finalizep t))

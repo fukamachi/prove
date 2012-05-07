@@ -253,7 +253,6 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                  *tests*)))))
 
 (defun run-test (name &key (finalizep t))
-  (format *test-result-output* "~2&# Test: ~a~%" name)
   (let ((test (find-test name)))
     (if test
         (funcall (cdr test))

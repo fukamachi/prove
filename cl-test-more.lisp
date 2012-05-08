@@ -28,6 +28,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            :finalize
            :deftest
            :run-test
+           :run-test-package
            :run-test-all
            :remove-test
            :remove-test-all
@@ -75,7 +76,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     (setf *plan* num
           *counter* 0
           *failed* 0))
-  (when num (format *test-result-output* "~&1..~a~%" num)))
+  (when (and num (numberp num))
+    (format *test-result-output* "~&1..~a~%" num)))
 
 (defun finalize ()
   (with-package-symbols (*plan* *counter* *failed*)
@@ -233,7 +235,15 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (test t nil (apply #'format nil desc args)))
 
 (defun find-test (name)
-  (assoc (symbol-name name) *tests* :test #'string=))
+  (assoc name *tests*))
+
+(defun find-tests-of-package (pkg &aux (package (find-package pkg)))
+  (reverse
+   (remove-if-not
+    #'(lambda (test)
+        (eq (symbol-package (car test))
+            package))
+    *tests*)))
 
 (defmacro deftest (name &rest test-forms)
   (let ((test (gensym))
@@ -256,7 +266,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                       (fail (string ',name))))))))
        (if ,test
            (rplacd ,test ,test-fn)
-           (push (cons ,(symbol-name name)
+           (push (cons ',name
                        ,test-fn)
                  *tests*)))))
 
@@ -267,8 +277,17 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
         (error "Not found test: ~a" (car test))))
   (and finalizep (finalize)))
 
+(defun run-test-package (package)
+  (plan (handler-case (symbol-value (intern (string :*plan*) package))
+          (unbound-variable () :unspecified)))
+  (loop for (name . nil) in (find-tests-of-package package)
+        do (run-test name :finalizep nil))
+  (finalize))
+
 (defun run-test-all ()
-  (map nil (lambda (test) (run-test (intern (car test)) :finalizep nil)) (reverse *tests*))
+  "DEPRECATED!"
+  (loop for (nil . body) in (reverse *tests*)
+        do (funcall body))
   (finalize))
 
 (defun remove-test (name)

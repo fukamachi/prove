@@ -44,22 +44,30 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defvar *gensym-prefix* "$")
 (defvar *test-result-output* *standard-output*)
 
+(defun write-string/indent (string &optional (stream *standard-output*))
+  (write-string
+   (make-string (* 4 *indent-level*)
+                :initial-element #\Space)
+   stream)
+  (write-string string stream))
+
 (defun format (stream control-string &rest format-arguments)
   (cond
     ((eq stream *test-result-output*)
-     (cl:format stream
-      "~&~V@{ ~}~A"
-      (* 4 *indent-level*)
-      (ppcre:regex-replace "^\\n"
-       (apply #'cl:format nil control-string format-arguments)
-       "")))
+     (map nil
+          (lambda (string)
+            (write-string/indent string stream)
+            (fresh-line))
+          (ppcre:split "\\n"
+           (apply #'cl:format nil control-string format-arguments))))
     (t
      (apply #'cl:format stream control-string format-arguments))))
 
 (defmacro with-package-symbols (symbols &body body)
   `(symbol-macrolet (,@(loop for s in symbols
                              collect
-                             (list (intern (symbol-name s) *package*) `(symbol-value (intern ,(symbol-name s) *package*)))))
+                             (list s
+                                   `(symbol-value (intern ,(symbol-name s) *package*)))))
      ,@body))
 
 (defun plan (num)

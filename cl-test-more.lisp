@@ -270,18 +270,17 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                        ,test-fn)
                  *tests*)))))
 
-(defun run-test (name &key (finalizep t))
+(defun run-test (name)
   (let ((test (find-test name)))
     (if test
         (funcall (cdr test))
-        (error "Not found test: ~a" (car test))))
-  (and finalizep (finalize)))
+        (error "Not found test: ~a" (car test)))))
 
 (defun run-test-package (package)
   (plan (handler-case (symbol-value (intern (string :*plan*) package))
           (unbound-variable () :unspecified)))
   (loop for (name . nil) in (find-tests-of-package package)
-        do (run-test name :finalizep nil))
+        do (run-test name))
   (finalize))
 
 (defun run-test-all ()

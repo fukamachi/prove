@@ -64,11 +64,20 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
     (t
      (apply #'cl:format stream control-string format-arguments))))
 
+(defun symbol-package-value (symbol-name &optional default)
+  (handler-case
+      (symbol-value (intern symbol-name *package*))
+    (unbound-variable () default)))
+
+(defun (setf symbol-package-value) (val symbol-name &optional default)
+  (declare (ignore default))
+  (setf (symbol-value (intern symbol-name *package*)) val))
+
 (defmacro with-package-symbols (symbols &body body)
   `(symbol-macrolet (,@(loop for s in symbols
                              collect
                              (list s
-                                   `(symbol-value (intern ,(symbol-name s) *package*)))))
+                                   `(symbol-package-value ,(symbol-name s) 0))))
      ,@body))
 
 (defun plan (num)
@@ -97,7 +106,11 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
       (format *test-result-output*
               "~&# Looks like you failed ~a tests of ~a run.~%" *failed* *counter*))
 
-    (= 0 *failed*)))
+    (prog1
+      (= 0 *failed*)
+      (setf *plan* :unspecified
+            *counter* 0
+            *failed* 0))))
 
 (defun add-exit-hook ()
   "DEPRECATED!"

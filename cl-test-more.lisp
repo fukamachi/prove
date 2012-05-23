@@ -43,7 +43,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defvar *tests* nil)
 (defvar *gensym-alist* nil)
 (defvar *gensym-prefix* "$")
-(defvar *test-result-output* *standard-output*)
+(defvar *test-result-output* t)
 
 (defun write-string/indent (string &optional (stream *standard-output*))
   (write-string
@@ -55,6 +55,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defun format (stream control-string &rest format-arguments)
   (cond
     ((eq stream *test-result-output*)
+     (when (eq stream t)
+       (setf stream *standard-output*))
      (map nil
           (lambda (string)
             (write-string/indent string stream)

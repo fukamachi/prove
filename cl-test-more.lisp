@@ -218,7 +218,10 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (let ((err (gensym)))
     `(let ((,err (handler-case ,form
                    (condition (error) error))))
-       (or (test (typep ,err ',condition) t ,desc)
+       (or (test (typep ,err ,(if (and (listp condition) (eq 'quote (car condition)))
+                                  condition
+                                  `(quote ,condition)))
+                 t ,desc)
            (format *test-result-output*
                    "~&#   got: ~S~%#   expected error: ~S~%"
                    ,err ',condition)))))

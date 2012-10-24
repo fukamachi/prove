@@ -10,4 +10,7 @@
     :author "Eitarow Fukamachi"
     :license "MIT"
     :depends-on ("cl-ppcre" "cl-annot")
-    :components ((:file "cl-test-more")))
+	:serial t
+    :components ((:file "cl-test-more")
+				 (:file "cl-test-functions")
+				 (:file "cl-test-runner")))

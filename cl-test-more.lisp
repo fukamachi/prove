@@ -10,39 +10,20 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 
 (defpackage cl-test-more
   (:nicknames :test-more)
-  (:use :cl :cl-ppcre)
-  (:shadow :format)
-  (:export :ok
-           :is
-           :isnt
-           :diag
-           :is-expand
-           :is-print
-           :is-error
-           :is-type
-           :like
-           :plan
-           :skip
-           :pass
-           :fail
-           :finalize
-           :deftest
-           :run-test
-           :run-test-package
-           :run-test-all
-           :remove-test
-           :remove-test-all
-           :*default-test-function*
-           :*gensym-prefix*
-           :*test-result-output*))
+  (:use :cl :cl-ppcre :annot :annot.doc)
+  (:shadow :format))
 
 (in-package :cl-test-more)
+(annot:enable-annot-syntax)
 
 (defvar *indent-level* 0)
+@export
 (defvar *default-test-function* #'equal)
 (defvar *tests* nil)
 (defvar *gensym-alist* nil)
+@export
 (defvar *gensym-prefix* "$")
+@export
 (defvar *test-result-output* t)
 
 (defun write-string/indent (string &optional (stream *standard-output*))
@@ -82,6 +63,9 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                                    `(symbol-package-value ,(symbol-name s) 0))))
      ,@body))
 
+@export
+@doc "I don't know well but it stores the total numbers of test.
+It seems to be resetting the counter."
 (defun plan (num)
   (with-package-symbols (*plan* *counter* *failed*)
     (setf *plan* num
@@ -90,6 +74,10 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (when (and num (numberp num))
     (format *test-result-output* "~&1..~a~%" num)))
 
+@export
+@doc "Finalizes the tests defined in the current package.
+All test defined in this package become accessible from outside
+via `find-tests-of-package'."
 (defun finalize ()
   (with-package-symbols (*plan* *counter* *failed*)
     (cond
@@ -169,17 +157,30 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
           (incf *failed*))
         res))))
 
+@export
+@doc "tests if the first argument is non-nil"
 (defun ok (test &optional desc)
   (test (not (null test)) t desc))
 
+@export
+@doc "tests if the first argument is nil"
+(defun ng (test &optional desc)
+  (test (not (null test)) t desc :notp t))
+
+@export
+@doc "tests (equal got expected)"
 (defun is (got expected &rest args)
   (or (test got expected args)
       (format *test-result-output* "~&#   got: ~S~%#   expected: ~S~%" got expected)))
 
+@export
+@doc "tests (not (equal got expected))"
 (defun isnt (got expected &rest args)
   (or (test got expected args :notp t)
       (format *test-result-output* "~&#   got: ~S~%#   not expected: ~S~%" got expected)))
 
+@export
+@doc "just outputs the message"
 (defun diag (desc)
   (format *test-result-output* "~&# ~a~%" desc))
 
@@ -200,6 +201,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (loop for a in x for b in y
         always (gensym-tree-equal a b)))
 
+@export
+@doc "tests (equalp (macroexpand-1 'got) expected)"
 (defmacro is-expand (got expected &optional desc)
   (let ((expanded (gensym)))
     `(let ((,expanded (macroexpand-1 ',got))
@@ -209,11 +212,16 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                    "~&#   got: ~S~%#   expanded: ~S~%#   expected: ~S~%"
                    ',got ,expanded ',expected)))))
 
+@export
+@doc "tests the output result of `got'"
 (defmacro is-print (got expected &optional desc)
   (let ((res (gensym)))
     `(let ((,res (with-output-to-string (*standard-output*) ,got)))
        (test ,res ,expected ,desc))))
 
+
+@export
+@doc "tests the error thrown by `got'"
 (defmacro is-error (form condition &optional desc)
   (let ((err (gensym)))
     `(let ((,err (handler-case ,form
@@ -226,18 +234,24 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                    "~&#   got: ~S~%#   expected error: ~S~%"
                    ,err ',condition)))))
 
+@export
+@doc "tests the type of the result of `got'"
 (defun is-type (got expected-type &optional desc)
   (or (test (typep got expected-type) t desc)
       (format *test-result-output*
               "~&#   got: ~S~%#   expected type: ~S~%"
               got expected-type)))
 
+@export
+@doc "tests if the regex matches the output result of `got'"
 (defun like (got regex &optional desc)
   (or (test (numberp (ppcre:scan regex got)) t desc)
       (format *test-result-output*
               "~&#   got: ~S~%#   like: ~S~% ~S~%"
               got regex (ppcre:scan regex got))))
 
+@export
+@doc "skip the next n tests"
 (defun skip (how-many why &rest args)
   (with-package-symbols (*counter*)
     (dotimes (i (or how-many 1))
@@ -246,15 +260,21 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
               "~&ok ~A # skip~:[~;~:* ~A~]~%"
               *counter* (apply #'format nil why args)))))
 
+@export
+@doc "it always passes"
 (defun pass (desc &rest args)
   (test t t (apply #'format nil desc args)))
 
+@export
+@doc "it always fails"
 (defun fail (desc &rest args)
   (test t nil (apply #'format nil desc args)))
 
 (defun find-test (name)
   (assoc name *tests*))
 
+@export
+@doc "List all tests defined in a package specified in the first argument."
 (defun find-tests-of-package (pkg &aux (package (find-package pkg)))
   (reverse
    (remove-if-not
@@ -263,7 +283,10 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
             package))
     *tests*)))
 
-(defmacro deftest (name &rest test-forms)
+@export
+@doc "define a named group of tests in this package.
+Each test is defined in the `body' form, which is an implicit progn."
+(defmacro deftest (name &body test-forms)
   (let ((test (gensym))
         (test-fn (gensym)))
     `(let ((,test (find-test ',name))
@@ -288,27 +311,38 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
                        ,test-fn)
                  *tests*)))))
 
+
+@export
+@doc "Run a test defined within the current package."
 (defun run-test (name)
   (let ((test (find-test name)))
     (if test
         (funcall (cdr test))
         (error "Not found test: ~a" (car test)))))
 
+@export
+@doc "Run all tests in the `package'."
 (defun run-test-package (package)
+  @type (or string symbol package) package
   (plan (handler-case (symbol-value (intern (string :*plan*) package))
           (unbound-variable () :unspecified)))
   (loop for (name . nil) in (find-tests-of-package package)
         do (run-test name))
   (finalize))
 
+@export
+@doc "DEPRECATED!"
 (defun run-test-all ()
-  "DEPRECATED!"
   (loop for (nil . body) in (reverse *tests*)
         do (funcall body))
   (finalize))
 
+@export
+@doc "remove the test named `name' in the current package."
 (defun remove-test (name)
   (setf *tests* (delete name *tests* :key #'car :test #'string=)))
 
+@export
+@doc "remove all tests in the current package."
 (defun remove-test-all ()
   (setf *tests* nil))

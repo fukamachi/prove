@@ -9,5 +9,5 @@
     :version "1.1.0"
     :author "Eitarow Fukamachi"
     :license "MIT"
-    :depends-on ("cl-ppcre")
+    :depends-on ("cl-ppcre" "cl-annot")
     :components ((:file "cl-test-more")))

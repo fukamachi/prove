@@ -33,6 +33,8 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
    stream)
   (write-string string stream))
 
+;; (declaim (optimize (debug 3)))
+
 (defun format (stream control-string &rest format-arguments)
   (cond
     ((eq stream *test-result-output*)

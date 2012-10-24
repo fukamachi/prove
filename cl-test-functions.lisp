@@ -25,8 +25,14 @@
 
 @export
 @doc "just outputs the message"
-(defun diag (desc)
-  (format *test-result-output* "~&# ~a~%" desc))
+(defun diag (desc-or-obj &rest args)
+  (if (stringp desc-or-obj)
+	  (format *test-result-output* 
+			  (concatenate 'string
+						   "~&# ~{" desc-or-obj "~}~%")
+			  args)
+	  (format *test-result-output* 
+			  "~&# ~a~%" desc-or-obj)))
 
 (defun gensymp (val)
   (and (symbolp val)

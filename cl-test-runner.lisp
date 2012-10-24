@@ -90,9 +90,34 @@ Each test is defined in the `body' form, which is an implicit progn."
   @type (or string symbol package) package
   (plan (handler-case (symbol-value (intern (string :*plan*) package))
           (unbound-variable () :unspecified)))
+  (diag "doing test in package ~A" package)
   (loop for test in (find-tests-of-package package)
         do (run-test test))
   (finalize))
+
+
+@export
+@doc "Walk down through the package hierarchy under `package' and
+ recursively run all the tests in those packages.
+ e.g. it considers `:pkg.a' as a module of `:pkg', and `:pkg.a.b' 
+as a module of `pkg.a' and so on."
+(defun run-test-recursively (package)
+  @type (or string symbol package) package
+  (let* ((package (if (packagep package) package
+					  (find-package package)))
+		 (name (package-name package))
+		 (children (remove-if-not 
+					(lambda (pkg)
+					  (scan (concatenate 'string
+										 "^" name "\\.[^.]*$")
+							(package-name pkg)))
+					(list-all-packages))))
+	(run-test-package package)
+	(when children
+	  (prog2
+		  (incf *indent-level*)
+		  (mapcar #'run-test-recursively children)
+		(decf *indent-level*)))))
 
 ;; @export
 ;; @doc "DEPRECATED!"
@@ -101,14 +126,22 @@ Each test is defined in the `body' form, which is an implicit progn."
 ;;         do (funcall body))
 ;;   (finalize))
 
-;; @export
-;; @doc "remove the test named `name' in the current package."
-;; (defun remove-test (name)
-;;   (setf *tests*
-;; 		(delete-if (lambda (test) (eq name (name-of test)))
-;; 				   *tests*)))
+@export
+@doc "remove the test named `name' in the current package."
+(defun remove-test (name)
+  (setf *tests*
+		(delete-if (lambda (test) (eq name (name-of test)))
+				   *tests*)))
 
-;; @export
-;; @doc "remove all tests in the current package."
-;; (defun remove-test-all ()
-;;   (setf *tests* nil))
+@export
+@doc "remove all tests in `package'"
+(defun remove-test-of-package (package)
+  (setf *tests*
+		(delete-if (lambda (test) (eq package (package-of test)))
+				   *tests*)))
+
+
+@export
+@doc "remove all tests in the current package."
+(defun remove-test-all ()
+  (setf *tests* nil))

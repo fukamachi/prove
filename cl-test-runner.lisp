@@ -57,8 +57,18 @@ Each test is defined in the `body' form, which is an implicit progn."
 						,(intern (string :*counter*) *package*)
 						,(intern (string :*failed*) *package*))
 					  `(,(1+ *indent-level*) nil 0 0)
-					,@test-forms
-					(setf successp (finalize)))
+					(catch 'deftest-error
+					  (handler-bind
+						  ((error
+							(lambda (e)
+							  (format
+							   *test-result-output*
+							   "~&# Tests terminated out of the test clauses:~%~&### ~a"
+							   e)
+							  (setf successp nil)
+							  (throw 'deftest-error e))))
+						,@test-forms
+						(setf successp (finalize)))))
 				  (if successp
 					  (pass (string ',name))
 					  (fail (string ',name))))))))
@@ -90,7 +100,7 @@ Each test is defined in the `body' form, which is an implicit progn."
   @type (or string symbol package) package
   (plan (handler-case (symbol-value (intern (string :*plan*) package))
           (unbound-variable () :unspecified)))
-  (diag "doing test in package ~A" package)
+  (format *test-result-output* "doing test in package ~A" package)
   (loop for test in (find-tests-of-package package)
         do (run-test test))
   (finalize))
@@ -136,10 +146,11 @@ as a module of `pkg.a' and so on."
 @export
 @doc "remove all tests in `package'"
 (defun remove-test-of-package (package)
-  (setf *tests*
-		(delete-if (lambda (test) (eq package (package-of test)))
-				   *tests*)))
-
+  (let ((package (if (packagep package) package
+					 (find-package package))))
+	(setf *tests*
+		  (delete-if (lambda (test) (eq package (package-of test)))
+					 *tests*))))
 
 @export
 @doc "remove all tests in the current package."

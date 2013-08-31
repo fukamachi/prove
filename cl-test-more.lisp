@@ -6,12 +6,40 @@ Copyright (c) 2010-2011 Eitarow Fukamachi <e.arrows@gmail.com>
 CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).
 |#
 
-(in-package :cl-user)
+;;
+;; ASDF integration
 
+(in-package :cl-user)
+(defpackage :cl-test-more.asdf
+  (:use :cl :asdf)
+  (:export :test-file
+           :run-test-system))
+(in-package :cl-test-more.asdf)
+
+(defvar *system-test-files* (make-hash-table))
+
+(defclass test-file (asdf:cl-source-file) ())
+(import 'test-file :asdf)
+
+(defmethod asdf:perform ((op asdf:load-op) (c test-file))
+  (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
+
+(defun run-test-system (system-designator)
+  (dolist (c (reverse
+              (gethash (asdf:find-system system-designator) *system-test-files*)))
+    (asdf:perform (make-instance 'asdf:load-source-op) c)))
+
+;;
+;; Main package
+
+(in-package :cl-user)
 (defpackage cl-test-more
   (:nicknames :test-more)
   (:use :cl :cl-ppcre)
   (:shadow :format)
+  (:import-from :cl-test-more.asdf
+                :test-file
+                :run-test-system)
   (:export :ok
            :is
            :isnt
@@ -34,8 +62,9 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            :remove-test-all
            :*default-test-function*
            :*gensym-prefix*
-           :*test-result-output*))
-
+           :*test-result-output*
+           :test-file
+           :run-test-system))
 (in-package :cl-test-more)
 
 (defvar *indent-level* 0)

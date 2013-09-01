@@ -6,7 +6,7 @@
 (in-package :cl-test-more-asd)
 
 (defsystem cl-test-more
-    :version "1.2.0"
+    :version "1.2.1"
     :author "Eitarow Fukamachi"
     :license "MIT"
     :depends-on ("cl-ppcre")

@@ -21,6 +21,10 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
 (defclass test-file (asdf:cl-source-file) ())
 (import 'test-file :asdf)
 
+(defmethod asdf:perform ((op asdf:compile-op) (c test-file))
+  ;; do nothing
+  )
+
 (defmethod asdf:perform ((op asdf:load-op) (c test-file))
   (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
 

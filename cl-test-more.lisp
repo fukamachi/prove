@@ -93,7 +93,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
      (map nil
           (lambda (string)
             (write-string/indent string stream)
-            (fresh-line stream))
+            (write-char #\Newline stream))
           (ppcre:split "\\n"
            (apply #'cl:format nil control-string format-arguments))))
     (t

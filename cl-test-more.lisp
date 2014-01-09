@@ -296,7 +296,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
             package))
     *tests*)))
 
-(defmacro deftest (name &rest test-forms)
+(defmacro deftest (name &body test-forms)
   (let ((test (gensym))
         (test-fn (gensym)))
     `(let ((,test (find-test ',name))

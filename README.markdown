@@ -4,38 +4,39 @@ CL-TEST-MORE is inspired by Test::More, a module of Perl.
 
 The advantages of CL-TEST-MORE are:
 
-* Just one file to load
-* Test with just simple functions
-* Results format is "Test Anything Protocol"
+* need to load just one file
+* test with just simple functions
+* report results in "Test Anything Protocol" format
 
 ## Synopsis
 
 ```common-lisp
 (plan 9)
 
-;; check if first argument is true
-(ok (eq got expected) "Description")
+;; Various way to say "ok":
+;; by checking if the first argument is true,
+(ok (eq got expected) "the name or description of this test")
 
-;; check if "got" equals "expected"
-(is got expected "Description")
-(isnt got expected "Description")
-;; with :test function
-(is got expected "Description" :test #'string=)
+;; by checking if the value of `got' equals the value of `expected', and
+(is got expected "the name or description of this test")
+(isnt got expected "the name or description of this test")
+;; with :test function.
+(is got expected "the name or description of this test" :test #'string=)
 
-;; rather than print *standard-output* "# This is just a comment\n"
+;; Rather than (princ "# This is just a comment\n" *standard-output*)
 (diag "This is just a comment")
 
-;; macro expansion
-(is-expand (got macro) (expected :like "this") "Description")
+;; Check a macro expansion.
+(is-expand (got macro) (expected :like "this") "the name or description of this test")
 
-;; output
-(is-print (write-line "aiueo") "aiueo\n" "Description")
+;; Check an output.
+(is-print (write-line "aiueo") "aiueo\n" "the name or description of this test")
 
-;; functions always pass or fail
-(pass "Description")
-(fail "Description")
+;; A function always passes, and always fails.
+(pass "the name or description of this test")
+(fail "the name or description of this test")
 
-;; Don't forget this
+;; Don't forget this.
 (finalize)
 ```
 
@@ -84,5 +85,5 @@ Please report any bugs to e.arrows@gmail.com, or post an issue to [GitHub](http:
 
 ## License
 
-Copyright (c) 2010-2011 Eitarow Fukamachi &lt;e.arrows@gmail.com&gt;  
+Copyright (c) 2010-2014 Eitarow Fukamachi &lt;e.arrows@gmail.com&gt;  
 CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).

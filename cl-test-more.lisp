@@ -49,6 +49,7 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            :isnt
            :diag
            :is-expand
+           :is-values
            :is-print
            :is-error
            :is-type
@@ -241,6 +242,9 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
            (format *test-result-output*
                    "~&#   got: ~S~%#   expanded: ~S~%#   expected: ~S~%"
                    ',got ,expanded ',expected)))))
+
+(defmacro is-values (got expected &rest args)
+  `(is (multiple-value-list ,got) ,expected ,@args))
 
 (defmacro is-print (got expected &optional desc)
   (let ((res (gensym)))

@@ -61,6 +61,7 @@ The advantages of CL-TEST-MORE are:
 * isnt
 * diag
 * is-expand
+* is-values
 * is-print
 * is-error
 * is-type

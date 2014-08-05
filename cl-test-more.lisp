@@ -220,14 +220,15 @@ CL-TEST-MORE is freely distributable under the MIT License (http://www.opensourc
   (and (symbolp val)
        (string= (subseq (symbol-name val) 0 (length *gensym-prefix*)) *gensym-prefix*)))
 
-(defmethod gensym-tree-equal (x y)
-  (if (and (gensymp y) (symbolp x))
-      (if (assoc y *gensym-alist*)
-          (eq x (cdr (assoc y *gensym-alist*)))
-          (unless (rassoc x *gensym-alist*)
-            (setf *gensym-alist* `((,y . ,x) ,@*gensym-alist*))
-            t))
-      (equal x y)))
+(defgeneric gensym-tree-equal (x y)
+  (:method (x y)
+    (if (and (gensymp y) (symbolp x))
+        (if (assoc y *gensym-alist*)
+            (eq x (cdr (assoc y *gensym-alist*)))
+            (unless (rassoc x *gensym-alist*)
+              (setf *gensym-alist* `((,y . ,x) ,@*gensym-alist*))
+              t))
+        (equal x y))))
 
 (defmethod gensym-tree-equal ((x cons) (y cons))
   (loop for a in x for b in y

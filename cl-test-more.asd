@@ -7,7 +7,7 @@
 
 (defsystem cl-test-more
     :version "1.2.1"
-    :author "Eitarow Fukamachi"
+    :author "Eitaro Fukamachi"
     :license "MIT"
     :depends-on ("cl-ppcre")
     :components ((:module "src"

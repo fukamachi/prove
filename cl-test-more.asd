@@ -10,4 +10,7 @@
     :author "Eitarow Fukamachi"
     :license "MIT"
     :depends-on ("cl-ppcre")
-    :components ((:file "cl-test-more")))
+    :components ((:module "src"
+                  :components
+                  ((:file "cl-test-more" :depends-on ("asdf"))
+                   (:file "asdf")))))

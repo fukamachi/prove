@@ -94,6 +94,17 @@
   (let ((failed-count (count-if #'failed-report-p reports))
         (count (count-if #'test-report-p reports)))
     (format/indent stream "~2&")
+    (cond
+      ((eq plan :unspecified)
+       (with-color-if-available (cl-colors:+yellow+ :stream stream)
+         (format/indent stream
+                        "△ Tests were run but no plan was declared.~%")))
+      ((and plan
+            (not (= count plan)))
+       (with-color-if-available (cl-colors:+yellow+ :stream stream)
+         (format/indent stream
+                        "△ Looks like you planned ~A tests but ran ~A.~%"
+                        plan count))))
     (if (< 0 failed-count)
         (with-color-if-available (cl-colors:+red+ :stream stream)
           (format/indent stream

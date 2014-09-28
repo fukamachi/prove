@@ -45,10 +45,10 @@
     (when (ppcre:scan "^~&" control-string)
       (fresh-line destination))
     (format destination (indent))
-    (format destination
-            (ppcre:regex-replace-all "(\\n)(?!$)"
-                                     output
-                                     (format nil "\\1~A" (indent))))))
+    (write-string (ppcre:regex-replace-all "(\\n)(?!$)"
+                                           output
+                                           (format nil "\\1~A" (indent)))
+                  destination)))
 
 (defclass report ()
   ((description :type (or null string)

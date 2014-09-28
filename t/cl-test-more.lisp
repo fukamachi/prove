@@ -26,6 +26,8 @@
 
 (pass "pass")
 (fail "fail")
+(pass "<~S>")
+(is "<~S>" "<~S>")
 
 (skip 1 "skipping")
 

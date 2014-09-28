@@ -52,7 +52,7 @@
   (format stream " ")
   (let ((description (possible-report-description report)))
     (when description
-      (format stream description))))
+      (write-string description stream))))
 
 (defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
@@ -62,7 +62,7 @@
     (format stream " ")
     (let ((description (possible-report-description report)))
       (when description
-        (format stream description)))))
+        (write-string description stream)))))
 
 (defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))

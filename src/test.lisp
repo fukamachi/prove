@@ -185,11 +185,11 @@
                      args)
       :passed-report-class 'skipped-test-report)))
 
-(defun pass (desc &rest args)
-  (test t t (apply #'format nil desc args)))
+(defun pass (desc)
+  (test t t desc))
 
-(defun fail (desc &rest args)
-  (test t nil (apply #'format nil desc args)
+(defun fail (desc)
+  (test t nil desc
         :print-error-detail nil))
 
 (defun %subtest (desc body-fn)

@@ -20,9 +20,15 @@
                 :format-report
                 :print-error-report
                 :print-plan-report
-                :print-finalize-report))
+                :print-finalize-report)
+  (:import-from :cl-test-more.color
+                :with-color-if-available)
+  (:import-from :cl-colors
+                :+white+
+                :+black+
+                :+green+
+                :+red+))
 (in-package :cl-test-more.report.tap)
-
 
 (defmethod format-report (stream (report report) (style (eql :tap)) &rest args)
   (declare (ignore args))
@@ -77,7 +83,15 @@
        (format/indent stream
                       "~&# Looks like you planned ~A tests but ran ~A.~%"
                       plan count)))
-    (when (< 0 failed-count)
-      (format/indent stream
-                     "~&# Looks like you failed ~A tests of ~A run.~%"
-                     failed-count count))))
+    (fresh-line stream)
+    (if (< 0 failed-count)
+        (with-color-if-available (cl-colors:+white+)
+          (with-color-if-available (cl-colors:+red+ :style :background)
+            (format/indent stream
+                           "# Looks like you failed ~A tests of ~A run."
+                           failed-count count)))
+        (with-color-if-available (cl-colors:+black+)
+          (with-color-if-available (cl-colors:+green+ :style :background)
+            (format/indent stream "# All ~D tests passed."
+                           count))))
+    (terpri stream)))

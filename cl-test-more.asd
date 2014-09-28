@@ -7,18 +7,19 @@
     :version "2.0.0"
     :author "Eitaro Fukamachi"
     :license "MIT"
-    :depends-on (:cl-ppcre)
+    :depends-on (:cl-ppcre :cl-ansi-text)
     :components ((:module "src"
                   :components
-                  ((:file "cl-test-more" :depends-on ("test" "suite" "asdf"))
+                  ((:file "cl-test-more" :depends-on ("test" "suite" "asdf" "color"))
                    (:file "test" :depends-on ("variables" "report" "suite"))
                    (:file "report" :depends-on ("variables"))
                    (:module "report-components"
                     :pathname "report"
-                    :depends-on ("report")
+                    :depends-on ("report" "color")
                     :components
                     ((:file "tap")
                      (:file "fiveam")))
                    (:file "suite" :depends-on ("variables" "report"))
                    (:file "asdf" :depends-on ("variables"))
+                   (:file "color")
                    (:file "variables")))))

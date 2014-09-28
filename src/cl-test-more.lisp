@@ -40,6 +40,8 @@
                 :reset-suite
                 :suite
                 :package-suite)
+  (:import-from :cl-test-more.color
+                :*force-enable-colorize*)
   (:export :*test-result-output*
            :*default-test-function*
            :*report-style*
@@ -72,4 +74,5 @@
            :*suite*
            :reset-suite
            :suite
-           :package-suite))
+           :package-suite
+           :*force-enable-colorize*))

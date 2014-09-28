@@ -26,7 +26,7 @@
 
 (defmethod format-report (stream (report report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&# ~A~%"
+  (format/indent stream "~%# ~A"
                  (slot-value report 'description)))
 
 (defun possible-report-description (report)
@@ -46,25 +46,23 @@
 
 (defmethod format-report (stream (report passed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
+  (format/indent stream "~%  ")
   (with-color-if-available (cl-colors:+green+)
     (format stream "✓"))
   (format stream " ")
   (let ((description (possible-report-description report)))
     (when description
-      (format stream description)))
-  (fresh-line stream))
+      (format stream description))))
 
 (defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
+  (format/indent stream "~%  ")
   (with-color-if-available (cl-colors:+red+)
     (format stream "×")
     (format stream " ")
     (let ((description (possible-report-description report)))
       (when description
-        (format stream description))))
-  (fresh-line stream))
+        (format stream description)))))
 
 (defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
@@ -72,7 +70,7 @@
 
 (defmethod format-report (stream (report composed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
+  (format/indent stream "~%  ")
   (if (failed-report-p report)
       (with-color-if-available (cl-colors:+red+)
         (format stream "×")
@@ -87,8 +85,7 @@
     (format-report stream
                    (make-instance 'report
                                   :description (format nil "1..~A" num))
-                   :list))
-  (format stream "~2&"))
+                   :list)))
 
 (defmethod print-finalize-report (stream plan reports (style (eql :list)))
   (let ((failed-count (count-if #'failed-report-p reports))

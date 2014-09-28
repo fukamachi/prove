@@ -46,9 +46,9 @@
       (fresh-line destination))
     (format destination (indent))
     (format destination
-            (ppcre:regex-replace-all "\\n(?!$)"
+            (ppcre:regex-replace-all "(\\n)(?!$)"
                                      output
-                                     (format nil "~%~A" (indent))))))
+                                     (format nil "\\1~A" (indent))))))
 
 (defclass report ()
   ((description :type (or null string)

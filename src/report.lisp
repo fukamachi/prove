@@ -33,7 +33,7 @@
            :format/indent))
 (in-package :cl-test-more.report)
 
-(defvar *report-style* :tap)
+(defvar *report-style* :list)
 
 (defparameter *indent-level* 0)
 

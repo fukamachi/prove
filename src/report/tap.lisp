@@ -18,7 +18,6 @@
                 :description
                 :format/indent
                 :format-report
-                :format-comment-report
                 :print-error-report
                 :print-plan-report
                 :print-finalize-report))
@@ -71,17 +70,14 @@
         (count (count-if #'test-report-p reports)))
     (cond
       ((eq plan :unspecified)
-       (format-comment-report stream
-                              "Tests were run but no plan was declared."
-                              :tap))
+       (format/indent stream
+                      "~&# Tests were run but no plan was declared.~%"))
       ((and plan
             (not (= count plan)))
-       (format-comment-report stream
-                              (format nil "Looks like you planned ~A tests but ran ~A."
-                                      plan count)
-                              :tap)))
+       (format/indent stream
+                      "~&# Looks like you planned ~A tests but ran ~A.~%"
+                      plan count)))
     (when (< 0 failed-count)
-      (format-comment-report stream
-                             (format nil "Looks like you failed ~A tests of ~A run."
-                                     failed-count count)
-                             :tap))))
+      (format/indent stream
+                     "~&# Looks like you failed ~A tests of ~A run.~%"
+                     failed-count count))))

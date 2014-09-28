@@ -23,7 +23,6 @@
            :report-expected-label
            :print-error-detail
 
-           :format-comment-report
            :print-error-report
            :format-report
            :print-plan-report
@@ -137,12 +136,6 @@
 (defgeneric format-report (stream report style &rest args)
   (:method (stream (report report) (style null) &rest args)
     (apply #'format-report stream report *report-style* args)))
-
-(defun format-comment-report (stream description style)
-  (format-report stream
-                 (make-instance 'comment-report
-                                :description description)
-                 style))
 
 (defgeneric print-plan-report (stream num style)
   (:method (stream num (style null))

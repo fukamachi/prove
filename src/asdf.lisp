@@ -16,6 +16,11 @@
   ;; do nothing
   )
 
+#+asdf3
+(defmethod asdf::compute-action-stamp :around (plan (o asdf:operation) (c test-file) &key just-done)
+  (let ((*error-output* (make-broadcast-stream)))
+    (call-next-method)))
+
 (defmethod asdf:perform ((op asdf:load-op) (c test-file))
   (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
 

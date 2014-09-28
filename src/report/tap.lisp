@@ -86,13 +86,13 @@
                       plan count)))
     (fresh-line stream)
     (if (< 0 failed-count)
-        (with-color-if-available (cl-colors:+white+)
-          (with-color-if-available (cl-colors:+red+ :style :background)
+        (with-color-if-available (cl-colors:+white+ :stream stream)
+          (with-color-if-available (cl-colors:+red+ :style :background :stream stream)
             (format/indent stream
                            "# Looks like you failed ~A tests of ~A run."
                            failed-count count)))
-        (with-color-if-available (cl-colors:+black+)
-          (with-color-if-available (cl-colors:+green+ :style :background)
+        (with-color-if-available (cl-colors:+black+ :stream stream)
+          (with-color-if-available (cl-colors:+green+ :style :background :stream stream)
             (format/indent stream "# All ~D tests passed."
                            count))))
     (terpri stream)))

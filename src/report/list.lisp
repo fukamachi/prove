@@ -26,7 +26,7 @@
 
 (defmethod format-report (stream (report report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~%# ~A"
+  (format/indent stream "~&# ~A~2%"
                  (slot-value report 'description)))
 
 (defun possible-report-description (report)
@@ -46,23 +46,25 @@
 
 (defmethod format-report (stream (report passed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~%  ")
-  (with-color-if-available (cl-colors:+green+)
+  (format/indent stream "~&  ")
+  (with-color-if-available (cl-colors:+green+ :stream stream)
     (format stream "✓"))
   (format stream " ")
   (let ((description (possible-report-description report)))
     (when description
-      (write-string description stream))))
+      (write-string description stream)))
+  (terpri stream))
 
 (defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~%  ")
-  (with-color-if-available (cl-colors:+red+)
+  (format/indent stream "~&  ")
+  (with-color-if-available (cl-colors:+red+ :stream stream)
     (format stream "×")
     (format stream " ")
     (let ((description (possible-report-description report)))
       (when description
-        (write-string description stream)))))
+        (write-string description stream))))
+  (terpri stream))
 
 (defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
@@ -70,15 +72,16 @@
 
 (defmethod format-report (stream (report composed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~%  ")
+  (format/indent stream "~&  ")
   (if (failed-report-p report)
-      (with-color-if-available (cl-colors:+red+)
+      (with-color-if-available (cl-colors:+red+ :stream stream)
         (format stream "×")
         (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description)))
       (progn
-        (with-color-if-available (cl-colors:+green+)
+        (with-color-if-available (cl-colors:+green+ :stream stream)
           (format stream "✓"))
-        (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description)))))
+        (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))))
+  (terpri stream))
 
 (defmethod print-plan-report (stream num (style (eql :list)))
   (when num
@@ -92,11 +95,11 @@
         (count (count-if #'test-report-p reports)))
     (format/indent stream "~2&")
     (if (< 0 failed-count)
-        (with-color-if-available (cl-colors:+red+)
+        (with-color-if-available (cl-colors:+red+ :stream stream)
           (format/indent stream
                          "× ~D of ~D tests failed"
                          failed-count count))
-        (with-color-if-available (cl-colors:+green+)
+        (with-color-if-available (cl-colors:+green+ :stream stream)
           (format/indent stream
                          "✓ ~D tests completed" count)))
     (terpri stream)))

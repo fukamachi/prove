@@ -63,11 +63,16 @@
   (let ((suite (current-suite)))
     (setf (slot-value suite 'plan) num)
     (reset-suite suite))
-  (print-plan-report *test-result-output* num nil))
+  (print-plan-report (if (eq *test-result-output* t)
+                         *standard-output*
+                         *test-result-output*)
+                     num nil))
 
 (defun finalize (&optional (suite (current-suite)))
   (with-slots (plan reports failed) suite
-    (print-finalize-report *test-result-output*
+    (print-finalize-report (if (eq *test-result-output* t)
+                               *standard-output*
+                               *test-result-output*)
                            plan reports nil)
     (prog1
         (zerop failed)

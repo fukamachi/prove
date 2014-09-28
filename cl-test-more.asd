@@ -18,7 +18,8 @@
                     :depends-on ("report" "color")
                     :components
                     ((:file "tap")
-                     (:file "fiveam")))
+                     (:file "fiveam")
+                     (:file "list")))
                    (:file "suite" :depends-on ("variables" "report"))
                    (:file "asdf" :depends-on ("variables"))
                    (:file "color")

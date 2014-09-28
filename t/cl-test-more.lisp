@@ -4,7 +4,7 @@
         :cl-test-more))
 (in-package :t.cl-test-more)
 
-(setf *report-style* :tap)
+(setf *report-style* :list)
 
 (plan 10)
 

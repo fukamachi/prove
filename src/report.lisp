@@ -142,7 +142,7 @@
     (print-plan-report stream num *report-style*))
   (:method (stream num (style t))
     ;; Do nothing
-    ))
+    (fresh-line stream)))
 
 (defgeneric print-finalize-report (stream plan reports style)
   (:method (stream plan reports (style null))

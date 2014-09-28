@@ -20,5 +20,5 @@
                     ((:file "tap")
                      (:file "fiveam")))
                    (:file "suite" :depends-on ("variables" "report"))
-                   (:file "asdf")
+                   (:file "asdf" :depends-on ("variables"))
                    (:file "variables")))))

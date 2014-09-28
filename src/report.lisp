@@ -57,7 +57,10 @@
 
 (defclass comment-report (report) ())
 
-(defclass test-report (report) ())
+(defclass test-report (report)
+  ((print-error-detail :type boolean
+                       :initarg :print-error-detail
+                       :initform t)))
 
 (defclass normal-test-report (test-report)
   ((test-function :type (or function symbol)
@@ -74,10 +77,7 @@
              :initform (error ":expected is required"))
    (report-expected-label :type (or null string)
                           :initarg :report-expected-label
-                          :initform nil)
-   (print-error-detail :type boolean
-                       :initarg :print-error-detail
-                       :initform t)))
+                          :initform nil)))
 
 (defclass composed-test-report (test-report)
   ((plan :initarg :plan
@@ -115,7 +115,7 @@
      (some #'skipped-report-p (slot-value report 'children)))
     (otherwise nil)))
 
-(defmethod print-object ((report test-report) stream)
+(defmethod print-object ((report normal-test-report) stream)
   (with-slots (got notp expected description) report
     (format stream
             "#<~A RESULT: ~S, GOT: ~S, ~:[~;NOT ~]EXPECTED: ~S~:[~;~:*, DESCRIPTION: ~A~]>"
@@ -139,7 +139,10 @@
 
 (defgeneric print-plan-report (stream num style)
   (:method (stream num (style null))
-    (print-plan-report stream num *report-style*)))
+    (print-plan-report stream num *report-style*))
+  (:method (stream num (style t))
+    ;; Do nothing
+    ))
 
 (defgeneric print-finalize-report (stream plan reports style)
   (:method (stream plan reports (style null))

@@ -4,6 +4,7 @@
   (:import-from :cl-test-more.report
                 :report
                 :test-report
+                :normal-test-report
                 :comment-report
                 :passed-report-p
                 :failed-report-p
@@ -52,7 +53,7 @@
                print-error-detail)
       (print-error-report stream report style))))
 
-(defmethod print-error-report (stream (report test-report) (style (eql :tap)))
+(defmethod print-error-report (stream (report normal-test-report) (style (eql :tap)))
   (with-slots (got got-form expected notp report-expected-label) report
     (when (failed-report-p report)
       (format/indent stream

@@ -6,7 +6,6 @@
                 :format/indent
                 :format-report
                 :print-error-report
-                :print-plan-report
                 :print-finalize-report
                 :test-report-p
                 :passed-report-p
@@ -62,11 +61,6 @@
 (defmethod print-error-report (stream (report comment-report) (style (eql :fiveam)))
   (format/indent stream "~& ~A~%"
                  (slot-value report 'description)))
-
-(defmethod print-plan-report (stream num (style (eql :fiveam)))
-  (declare (ignore stream num))
-  ;; Do nothing
-  )
 
 (defmethod print-finalize-report (stream plan reports (style (eql :fiveam)))
   (let ((failed-count (count-if #'failed-report-p reports))

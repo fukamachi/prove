@@ -6,5 +6,5 @@
 (defsystem cl-test-more-asdf
     :components ((:module "src"
                   :components
-                  ((:file "asdf" :depends-on ("variables"))
-                   (:file "variables")))))
+                  ((:file "asdf" :depends-on ("output"))
+                   (:file "output")))))

@@ -5,8 +5,12 @@
   (:import-from :cl-test-more.output
                 :*test-result-output*)
   (:export :test-file
-           :run-test-system))
+           :run-test-system
+
+           :*last-suite-report*))
 (in-package :cl-test-more.asdf)
+
+(defvar *last-suite-report* nil)
 
 (defvar *system-test-files* (make-hash-table))
 

@@ -7,7 +7,10 @@
                 :report
                 :print-plan-report
                 :print-finalize-report)
+  (:import-from :cl-test-more.asdf
+                :*last-suite-report*)
   (:export :*suite*
+
            :current-suite
 
            :suite
@@ -72,6 +75,6 @@
   (with-slots (plan reports failed) suite
     (print-finalize-report (test-result-output)
                            plan reports nil)
-    (prog1
-        (zerop failed)
-      (reset-suite suite))))
+    (setf *last-suite-report*
+          (list :plan plan :failed failed :reports reports))
+    (zerop failed)))

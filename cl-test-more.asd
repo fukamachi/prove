@@ -20,7 +20,7 @@
                     ((:file "tap")
                      (:file "fiveam")
                      (:file "list")))
-                   (:file "suite" :depends-on ("output" "report"))
+                   (:file "suite" :depends-on ("output" "report" "asdf"))
                    (:file "asdf" :depends-on ("output"))
                    (:file "color")
                    (:file "output")))))

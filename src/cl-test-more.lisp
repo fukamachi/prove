@@ -33,6 +33,8 @@
   (:import-from :cl-test-more.report
                 :*report-style*)
   (:import-from :cl-test-more.suite
+                :*default-slow-threshold*
+                :slow-threshold
                 :plan
                 :finalize
                 :current-suite
@@ -70,6 +72,8 @@
            :plan
            :finalize
            :*gensym-prefix*
+           :*default-slow-threshold*
+           :slow-threshold
            :current-suite
            :*suite*
            :reset-suite

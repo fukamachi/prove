@@ -28,6 +28,14 @@
                (eq got got-form)
                got)))))
 
+(defun print-duration (stream duration slow-threshold)
+  (let ((color (cond
+                 ((< slow-threshold duration) :red)
+                 ((< (/ slow-threshold 2) duration) :yellow))))
+    (when color
+      (with-color (color :stream stream)
+        (format stream "(~Dms)" duration)))))
+
 (defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
@@ -35,11 +43,15 @@
                    :cyan
                    :green) :stream stream)
     (format stream "✓"))
-  (format stream " ")
-  (let ((description (possible-report-description report)))
+  (let ((description (possible-report-description report))
+        (duration (slot-value report 'duration)))
     (when description
+      (format stream " ")
       (with-color (:gray :stream stream)
-        (write-string description stream))))
+        (write-string description stream)))
+    (when duration
+      (format stream " ")
+      (print-duration stream duration (slot-value report 'slow-threshold))))
   (terpri stream))
 
 (defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)
@@ -47,25 +59,36 @@
   (format/indent stream "~&  ")
   (with-color (:red :stream stream)
     (format stream "×")
-    (format stream " ")
-    (let ((description (possible-report-description report)))
+    (let ((description (possible-report-description report))
+          (duration (slot-value report 'duration)))
       (when description
-        (write-string description stream))))
+        (format stream " ")
+        (write-string description stream))
+      (when duration
+        (format stream " ")
+        (print-duration stream duration (slot-value report 'slow-threshold)))))
   (terpri stream))
 
 (defmethod format-report (stream (report composed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
-  (if (failed-report-p report)
-      (with-color (:red :stream stream)
-        (format stream "×")
-        (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description)))
-      (progn
-        (with-color ((if (skipped-report-p report)
-                         :cyan
-                         :green) :stream stream)
-          (format stream "✓"))
-        (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))))
+  (flet ((print-duration-in-gray ()
+           (when (slot-value report 'duration)
+             (format stream " ")
+             (with-color (:gray :stream stream)
+               (format stream "(~Dms)" (slot-value report 'duration))))))
+    (format/indent stream "~&  ")
+    (if (failed-report-p report)
+        (with-color (:red :stream stream)
+          (format stream "×")
+          (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))
+          (print-duration-in-gray))
+        (progn
+          (with-color ((if (skipped-report-p report)
+                           :cyan
+                           :green) :stream stream)
+            (format stream "✓"))
+          (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))
+          (print-duration-in-gray))))
   (terpri stream))
 
 (defmethod print-plan-report (stream num (style (eql :list)))

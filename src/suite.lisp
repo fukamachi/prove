@@ -19,6 +19,8 @@
            :test-count
            :failed
            :reports
+           :slow-threshold
+           :*default-slow-threshold*
 
            :add-report
            :plan
@@ -26,17 +28,25 @@
 (in-package :cl-test-more.suite)
 
 (defparameter *suite* nil)
+(defparameter *default-slow-threshold* 75)
 
 (defclass suite ()
   ((plan :initarg :plan
          :initform :unspecified
          :accessor suite-plan)
+   (slow-threshold :initarg :slow-threshold
+                   :initform *default-slow-threshold*)
    (test-count :initform 0
                :accessor test-count)
    (failed :initform 0
            :accessor failed)
    (reports :initform (make-array 0 :adjustable t :fill-pointer 0)
             :accessor reports)))
+
+(defun slow-threshold (&optional new-threshold)
+  (if new-threshold
+      (setf (slot-value (current-suite) 'slow-threshold) new-threshold)
+      (slot-value (current-suite) 'slow-threshold)))
 
 (defclass package-suite (suite) ())
 

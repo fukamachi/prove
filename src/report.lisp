@@ -23,6 +23,8 @@
            :got-form
            :expected
            :report-expected-label
+           :duration
+           :slow-threshold
            :print-error-detail
 
            :print-error-report
@@ -60,7 +62,9 @@
 (defclass comment-report (report) ())
 
 (defclass test-report (report)
-  ((print-error-detail :type boolean
+  ((duration :initarg :duration)
+   (slow-threshold :initarg :slow-threshold)
+   (print-error-detail :type boolean
                        :initarg :print-error-detail
                        :initform t)))
 

@@ -7,7 +7,9 @@
     :version "2.0.0"
     :author "Eitaro Fukamachi"
     :license "MIT"
-    :depends-on (:cl-ppcre :cl-ansi-text)
+    :depends-on (:cl-ppcre
+                 :cl-ansi-text
+                 :alexandria)
     :components ((:module "src"
                   :components
                   ((:file "cl-test-more" :depends-on ("test" "suite" "asdf" "color"))

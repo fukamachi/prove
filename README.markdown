@@ -5,9 +5,10 @@ CL-TEST-MORE is yet another unit testing framework for Common Lisp, inspired by 
 The advantages of CL-TEST-MORE are:
 
 * Various simple functions for testing and informative error messages
-* Extensible test reporters
-* Colorize the report if it's available
 * [ASDF integration](#asdf-integration)
+* Extensible test reporters
+* Colorizes the report if it's available
+* Reports test durations
 
 ## Quickstart
 
@@ -234,6 +235,14 @@ Declares a number of `num` tests are going to run. If `finalize` is called with 
 ### (finalize)
 
 Finalizes the current test suite and outputs the test reports.
+
+### (slow-threshold milliseconds)
+
+Set the threshold of slow test durations for the current test suite. The default threshold value is `cl-test-more:*default-slow-threshold*`.
+
+```common-lisp
+(slow-threshold 150)
+```
 
 ## Tips
 

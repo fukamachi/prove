@@ -4,6 +4,7 @@
   (:import-from :cl-test-more.output
                 :test-result-output)
   (:import-from :cl-test-more.report
+                :test-report-p
                 :passed-test-report
                 :failed-test-report
                 :skipped-test-report
@@ -11,6 +12,7 @@
                 :composed-test-report
                 :failed-report-p
                 :format-report
+                :duration
                 :*indent-level*)
   (:import-from :cl-test-more.suite
                 :suite
@@ -19,9 +21,12 @@
                 :test-count
                 :failed
                 :reports
+                :slow-threshold
                 :current-suite
                 :finalize
                 :add-report)
+  (:import-from :alexandria
+                :with-gensyms)
   (:export :*default-test-function*
 
            :ok
@@ -67,6 +72,7 @@
 
 (defun test (got expected args
              &key notp
+               duration
                (got-form nil got-form-supplied-p)
                (test-fn *default-test-function*)
                (passed-report-class 'passed-test-report)
@@ -84,6 +90,8 @@
                           (if result
                               passed-report-class
                               failed-report-class)
+                          :duration duration
+                          :slow-threshold (slot-value suite 'slow-threshold)
                           :test-function test-function
                           :notp notp
                           :got got
@@ -103,50 +111,81 @@
         (format-report (test-result-output) report nil :count (test-count suite)))
       (values result report))))
 
-(defun ok (test &optional desc)
-  (test test t desc :test-fn (lambda (x y)
-                               (eq (not (null x)) y))))
+(defmacro with-duration (((duration result) form) &body body)
+  (with-gensyms (start end)
+    `(let* ((,start (get-internal-real-time))
+            (,result ,form)
+            (,end (get-internal-real-time))
+            (,duration (- ,end ,start)))
+       ,@body)))
 
-(defun is (got expected &rest args)
-  (test got expected args))
+(defmacro ok (test &optional desc)
+  (with-gensyms (duration result)
+    `(with-duration ((,duration ,result) ,test)
+       (test ,result t ,desc
+             :duration ,duration
+             :test-fn (lambda (x y)
+                        (eq (not (null x)) y))))))
 
-(defun isnt (got expected &rest args)
-  (test got expected args :notp t))
+(defmacro is (got expected &rest args)
+  (with-gensyms (duration result)
+    `(with-duration ((,duration ,result) ,got)
+       (test ,result ,expected (list ,@args)
+             :duration ,duration))))
+
+(defmacro isnt (got expected &rest args)
+  (with-gensyms (duration result)
+    `(with-duration ((,duration ,result) ,got)
+       (test ,result ,expected (list ,@args)
+             :notp t
+             :duration ,duration))))
 
 (defmacro is-values (got expected &rest args)
   `(is (multiple-value-list ,got) ,expected ,@args))
 
 (defmacro is-print (got expected &optional desc)
-  (let ((output (gensym "OUTPUT")))
-    `(let ((,output (with-output-to-string (*standard-output*) ,got)))
+  (with-gensyms (output duration duration-inner)
+    `(let* (,duration
+            (,output (with-output-to-string (*standard-output*)
+                       (with-duration ((,duration-inner ,output) ,got)
+                         (declare (ignore ,output))
+                         (setq ,duration ,duration-inner)))))
        (test ,output ,expected ,desc
-         :got-form ',got
-         :test-fn #'string=
-         :report-expected-label "output"))))
+             :duration ,duration
+             :got-form ',got
+             :test-fn #'string=
+             :report-expected-label "output"))))
 
 (defmacro is-error (form condition &optional desc)
-  (let ((error (gensym "ERROR")))
-    `(let ((,error (handler-case ,form
-                     (condition (error) error))))
+  (with-gensyms (error duration)
+    `(with-duration ((,duration ,error) (handler-case ,form
+                                          (condition (,error) ,error)))
        (test ,error
-         ,(if (and (listp condition) (eq 'quote (car condition)))
-              condition
-              `(quote ,condition))
-         ,desc
-         :got-form ',form
-         :test-fn #'typep
-         :report-expected-label "raise a condition"))))
+             ,(if (and (listp condition) (eq 'quote (car condition)))
+                  condition
+                  `(quote ,condition))
+             ,desc
+             :duration ,duration
+             :got-form ',form
+             :test-fn #'typep
+             :report-expected-label "raise a condition"))))
 
-(defun is-type (got expected-type &optional desc)
-  (test (type-of got) expected-type desc
-        :got-form got
-        :test-fn #'subtypep
-        :report-expected-label "be a type of"))
+(defmacro is-type (got expected-type &optional desc)
+  (with-gensyms (duration result)
+    `(with-duration ((,duration ,result) ,got)
+       (test (type-of ,result) ,expected-type ,desc
+             :duration ,duration
+             :got-form ',got
+             :test-fn #'subtypep
+             :report-expected-label "be a type of"))))
 
-(defun like (got regex &optional desc)
-  (test got regex desc
-        :test-fn (lambda (x y) (not (null (ppcre:scan y x))))
-        :report-expected-label "be like"))
+(defmacro like (got regex &optional desc)
+  (with-gensyms (duration result)
+    `(with-duration ((,duration ,result) ,got)
+       (test ,result ,regex ,desc
+             :duration ,duration
+             :test-fn (lambda (x y) (not (null (ppcre:scan y x))))
+             :report-expected-label "be like"))))
 
 (defvar *gensym-prefix* "$")
 (defvar *gensym-alist* nil)
@@ -169,13 +208,14 @@
           always (gensym-tree-equal a b))))
 
 (defmacro is-expand (got expected &optional desc)
-  (let ((expanded (gensym "EXPANDED")))
-    `(let ((,expanded (macroexpand-1 ',got))
-           *gensym-alist*)
-       (test ,expanded ',expected ,desc
-             :got-form ',got
-             :report-expected-label "be expanded to"
-             :test-fn #'gensym-tree-equal))))
+  (with-gensyms (duration expanded)
+    `(with-duration ((,duration ,expanded) (macroexpand-1 ',got))
+       (let (*gensym-alist*)
+         (test ,expanded ',expected ,desc
+               :duration ,duration
+               :got-form ',got
+               :report-expected-label "be expanded to"
+               :test-fn #'gensym-tree-equal)))))
 
 (defun diag (desc)
   (let ((report (make-instance 'comment-report
@@ -202,6 +242,9 @@
                 (*indent-level* (1+ *indent-level*)))
             (funcall body-fn)
             (make-instance 'composed-test-report
+                           :duration (reduce #'+
+                                             (remove-if-not #'test-report-p (reports *suite*))
+                                             :key (lambda (report) (or (slot-value report 'duration) 0)))
                            :plan (suite-plan *suite*)
                            :description desc
                            :children (reports *suite*))))

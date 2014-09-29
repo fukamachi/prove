@@ -29,9 +29,17 @@
   (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
 
 (defun run-test-system (system-designator)
-  (dolist (c (reverse
-              (gethash (asdf:find-system system-designator) *system-test-files*)))
-    (format *test-result-output* "~2&Running a test file '~A'~%" (asdf:component-pathname c))
-    (asdf:perform (make-instance 'asdf:load-source-op) c)))
+  (let ((failed-files '()))
+    (dolist (c (reverse
+                (gethash (asdf:find-system system-designator) *system-test-files*)))
+      (setf *last-suite-report* nil)
+      (format *test-result-output* "~2&Running a test file '~A'~%" (asdf:component-pathname c))
+      (asdf:perform (make-instance 'asdf:load-source-op) c)
+      (unless *last-suite-report*
+        (warn "Test completed without 'finalize'd."))
+      (unless (eql (getf *last-suite-report* :failed) 0)
+        (push (asdf:component-pathname c) failed-files)))
+    (values (null failed-files)
+            (nreverse failed-files))))
 
 (import 'test-file :asdf)

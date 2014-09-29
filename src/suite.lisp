@@ -76,5 +76,5 @@
     (print-finalize-report (test-result-output)
                            plan reports nil)
     (setf *last-suite-report*
-          (list :plan plan :failed failed :reports reports))
+          (list :plan plan :failed failed))
     (zerop failed)))

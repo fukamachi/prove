@@ -286,10 +286,13 @@ Add `:defsystem-depends-on (:cl-test-more-asdf)` to your testing ASDF system to 
                              c)))
 ```
 
-To run tests, execute `asdf:test-system` in your REPL.
+To run tests, execute `asdf:test-system` or `cl-test-more:run-test-system` in your REPL.
 
 ```common-lisp
 (asdf:test-system :my-app)
+
+;; Same to 'asdf:test-system' except it returns T or NIL as the result of tests.
+(cl-test-more:run-test-system :my-app)
 ```
 
 ### Reporters

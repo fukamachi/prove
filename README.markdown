@@ -7,7 +7,7 @@ The advantages of CL-TEST-MORE are:
 * Various simple functions for testing and informative error messages
 * Extensible test reporters
 * Colorize the report if it's available
-* ASDF integration
+* [ASDF integration](#asdf-integration)
 
 ## Quickstart
 
@@ -29,11 +29,13 @@ The advantages of CL-TEST-MORE are:
 (finalize)
 ```
 
-### 2. Run a test
+### 2. Run a test file
 
 ```common-lisp
 (load #P"/path/to/my-test.lisp")
 ```
+
+See also: [ASDF integration](#asdf-integration)
 
 ### 3. Get a report
 
@@ -242,6 +244,12 @@ SLIME doesn't support to color with ANSI colors in the REPL buffer officially.
 You can add the feature by using [slime-repl-ansi-color.el](https://github.com/enriquefernandez/slime-repl-ansi-color).
 
 After installing it, set `cl-test-more:*enable-colors*` to `T` before running tests.
+
+```common-lisp
+;; A part of my ~/.sbclrc
+(ql:quickload :cl-test-more)
+(setf cl-test-more:*enable-colors* t)
+```
 
 ### ASDF integration
 

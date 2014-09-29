@@ -171,7 +171,10 @@
   (let ((expanded (gensym "EXPANDED")))
     `(let ((,expanded (macroexpand-1 ',got))
            *gensym-alist*)
-       (test ,expanded ',expected ,desc :test-fn #'gensym-tree-equal))))
+       (test ,expanded ',expected ,desc
+             :got-form ',got
+             :report-expected-label "be expanded to"
+             :test-fn #'gensym-tree-equal))))
 
 (defun diag (desc)
   (let ((report (make-instance 'comment-report

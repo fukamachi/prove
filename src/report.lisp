@@ -1,10 +1,11 @@
 (in-package :cl-user)
 (defpackage cl-test-more.report
   (:use :cl)
-  (:import-from :cl-test-more.variables
-                :*default-test-function*)
-  (:export :report
+  (:export :*report-style*
+
+           :report
            :test-report
+           :normal-test-report
            :passed-test-report
            :failed-test-report
            :skipped-test-report
@@ -16,6 +17,7 @@
            :failed-report-p
            :skipped-report-p
 
+           :description
            :notp
            :got
            :got-form

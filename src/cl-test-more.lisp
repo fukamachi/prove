@@ -2,13 +2,13 @@
 (defpackage cl-test-more
   (:nicknames :test-more)
   (:use :cl)
-  (:import-from :cl-test-more.variables
-                :*test-result-output*
-                :*default-test-function*)
+  (:import-from :cl-test-more.output
+                :*test-result-output*)
   (:import-from :cl-test-more.asdf
                 :test-file
                 :run-test-system)
   (:import-from :cl-test-more.test
+                :*default-test-function*
                 :ok
                 :is
                 :isnt
@@ -41,7 +41,7 @@
                 :suite
                 :package-suite)
   (:import-from :cl-test-more.color
-                :*force-enable-colorize*)
+                :*enable-colors*)
   (:export :*test-result-output*
            :*default-test-function*
            :*report-style*
@@ -75,4 +75,4 @@
            :reset-suite
            :suite
            :package-suite
-           :*force-enable-colorize*))
+           :*enable-colors*))

@@ -2,16 +2,14 @@
 (defpackage cl-test-more.color
   (:use :cl)
   (:import-from :cl-ansi-text
-                :with-color)
-  (:export :*force-enable-colorize*
-           :with-color-if-available))
+                :generate-color-string)
+  (:export :*enable-colorize*
+           :with-color))
 (in-package :cl-test-more.color)
 
-(defvar *force-enable-colorize* nil)
-
-(defun color-available-p ()
-  (or (not (equal (asdf::getenv "EMACS") "t"))
-      *force-enable-colorize*))
+(defvar *enable-colors*
+  (not (equal (asdf::getenv "EMACS") "t"))
+  "Flag whether colorize a test report. The default is T except on Emacs (SLIME).")
 
 (defmacro with-gray (stream &body body)
   `(progn
@@ -19,10 +17,12 @@
      (unwind-protect (progn ,@body)
        (format ,stream (cl-ansi-text::generate-color-string 0)))))
 
-(defmacro with-color-if-available ((color &rest args) &body body)
-  `(if (color-available-p)
+(defmacro with-color ((color &rest args) &body body)
+  `(if *enable-colors*
        (if (or (eq ,color :gray)
-               (eq ,color cl-colors:+gray+))
+               (eq ,color :grey)
+               (eq ,color cl-colors:+gray+)
+               (eq ,color cl-colors:+grey+))
            (with-gray ,(or (getf args :stream) t) ,@body)
-           (with-color (,color ,@args) ,@body))
+           (cl-ansi-text:with-color (,color ,@args) ,@body))
        (progn ,@body)))

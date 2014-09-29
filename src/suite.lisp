@@ -1,9 +1,10 @@
 (in-package :cl-user)
 (defpackage cl-test-more.suite
   (:use :cl)
-  (:import-from :cl-test-more.variables
-                :*test-result-output*)
+  (:import-from :cl-test-more.output
+                :test-result-output)
   (:import-from :cl-test-more.report
+                :report
                 :print-plan-report
                 :print-finalize-report)
   (:export :*suite*
@@ -57,22 +58,19 @@
     (setf reports (make-array 0 :adjustable t :fill-pointer 0))))
 
 (defun add-report (report suite)
+  (check-type report report)
   (vector-push-extend report (slot-value suite 'reports)))
 
 (defun plan (num)
   (let ((suite (current-suite)))
     (setf (slot-value suite 'plan) num)
     (reset-suite suite))
-  (print-plan-report (if (eq *test-result-output* t)
-                         *standard-output*
-                         *test-result-output*)
+  (print-plan-report (test-result-output)
                      num nil))
 
 (defun finalize (&optional (suite (current-suite)))
   (with-slots (plan reports failed) suite
-    (print-finalize-report (if (eq *test-result-output* t)
-                               *standard-output*
-                               *test-result-output*)
+    (print-finalize-report (test-result-output)
                            plan reports nil)
     (prog1
         (zerop failed)

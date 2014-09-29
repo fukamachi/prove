@@ -1,9 +1,8 @@
 (in-package :cl-user)
 (defpackage cl-test-more.test
   (:use :cl)
-  (:import-from :cl-test-more.variables
-                :*default-test-function*
-                :*test-result-output*)
+  (:import-from :cl-test-more.output
+                :test-result-output)
   (:import-from :cl-test-more.report
                 :passed-test-report
                 :failed-test-report
@@ -23,7 +22,9 @@
                 :current-suite
                 :finalize
                 :add-report)
-  (:export :ok
+  (:export :*default-test-function*
+
+           :ok
            :is
            :isnt
            :is-values
@@ -47,6 +48,8 @@
            :remove-test
            :remove-test-all))
 (in-package :cl-test-more.test)
+
+(defvar *default-test-function* #'equal)
 
 (defun parse-description-and-test (args)
   (if (consp args)
@@ -97,9 +100,7 @@
         (incf (failed suite)))
       (incf (test-count suite))
       (when output
-        (format-report (if (eq *test-result-output* t)
-                           *standard-output*
-                           *test-result-output*) report nil :count (test-count suite)))
+        (format-report (test-result-output) report nil :count (test-count suite)))
       (values result report))))
 
 (defun ok (test &optional desc)
@@ -180,9 +181,7 @@
   (let ((report (make-instance 'comment-report
                                :description desc)))
     (add-report report (current-suite))
-    (format-report (if (eq *test-result-output* t)
-                       *standard-output*
-                       *test-result-output*) report nil)))
+    (format-report (test-result-output) report nil)))
 
 (defun skip (how-many why)
   (check-type how-many integer)
@@ -209,9 +208,7 @@
         (suite (current-suite)))
     (add-report report suite)
     (incf (test-count suite))
-    (format-report (if (eq *test-result-output* t)
-                       *standard-output*
-                       *test-result-output*) report nil :count (test-count suite))))
+    (format-report (test-result-output) report nil :count (test-count suite))))
 
 (defmacro subtest (desc &body body)
   `(%subtest ,desc (lambda () ,@body)))

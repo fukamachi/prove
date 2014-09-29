@@ -2,7 +2,7 @@
 (defpackage cl-test-more.asdf
   (:use :cl
         :asdf)
-  (:import-from :cl-test-more.variables
+  (:import-from :cl-test-more.output
                 :*test-result-output*)
   (:export :test-file
            :run-test-system))

@@ -1,29 +1,7 @@
 (in-package :cl-user)
 (defpackage cl-test-more.report.fiveam
-  (:use :cl)
-  (:import-from :cl-test-more.report
-                :*indent-level*
-                :format/indent
-                :format-report
-                :print-error-report
-                :print-finalize-report
-                :test-report-p
-                :passed-report-p
-                :failed-report-p
-                :skipped-report-p
-                :description
-                :got
-                :got-form
-                :expected
-                :notp
-                :report-expected-label
-                :report
-                :print-error-detail
-                :plan
-                :children
-                :comment-report
-                :test-report
-                :composed-test-report))
+  (:use :cl
+        :cl-test-more.report))
 (in-package :cl-test-more.report.fiveam)
 
 (defmethod format-report (stream (report report) (style (eql :fiveam)) &rest args)

@@ -11,8 +11,8 @@
     :components ((:module "src"
                   :components
                   ((:file "cl-test-more" :depends-on ("test" "suite" "asdf" "color"))
-                   (:file "test" :depends-on ("variables" "report" "suite"))
-                   (:file "report" :depends-on ("variables"))
+                   (:file "test" :depends-on ("output" "report" "suite"))
+                   (:file "report")
                    (:module "report-components"
                     :pathname "report"
                     :depends-on ("report" "color")
@@ -20,7 +20,7 @@
                     ((:file "tap")
                      (:file "fiveam")
                      (:file "list")))
-                   (:file "suite" :depends-on ("variables" "report"))
-                   (:file "asdf" :depends-on ("variables"))
+                   (:file "suite" :depends-on ("output" "report"))
+                   (:file "asdf" :depends-on ("output"))
                    (:file "color")
-                   (:file "variables")))))
+                   (:file "output")))))

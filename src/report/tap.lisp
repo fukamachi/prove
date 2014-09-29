@@ -1,35 +1,9 @@
 (in-package :cl-user)
 (defpackage cl-test-more.report.tap
-  (:use :cl)
-  (:import-from :cl-test-more.report
-                :report
-                :test-report
-                :normal-test-report
-                :skipped-test-report
-                :comment-report
-                :passed-report-p
-                :failed-report-p
-                :skipped-report-p
-                :test-report-p
-                :got
-                :got-form
-                :expected
-                :notp
-                :report-expected-label
-                :print-error-detail
-                :description
-                :format/indent
-                :format-report
-                :print-error-report
-                :print-plan-report
-                :print-finalize-report)
+  (:use :cl
+        :cl-test-more.report)
   (:import-from :cl-test-more.color
-                :with-color-if-available)
-  (:import-from :cl-colors
-                :+white+
-                :+black+
-                :+green+
-                :+red+))
+                :with-color))
 (in-package :cl-test-more.report.tap)
 
 (defmethod format-report (stream (report report) (style (eql :tap)) &rest args)
@@ -94,13 +68,11 @@
                       plan count)))
     (fresh-line stream)
     (if (< 0 failed-count)
-        (with-color-if-available (cl-colors:+white+ :stream stream)
-          (with-color-if-available (cl-colors:+red+ :style :background :stream stream)
-            (format/indent stream
-                           "# Looks like you failed ~D test~:*~P of ~A run."
-                           failed-count count)))
-        (with-color-if-available (cl-colors:+black+ :stream stream)
-          (with-color-if-available (cl-colors:+green+ :style :background :stream stream)
-            (format/indent stream "# All ~D test~:*~P passed."
-                           count))))
+        (with-color (:red :stream stream)
+          (format/indent stream
+                         "# Looks like you failed ~D test~:*~P of ~A run."
+                         failed-count count))
+        (with-color (:green :stream stream)
+          (format/indent stream "# All ~D test~:*~P passed."
+                         count)))
     (terpri stream)))

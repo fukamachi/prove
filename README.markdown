@@ -241,7 +241,7 @@ SLIME doesn't support to color with ANSI colors in the REPL buffer officially.
 
 You can add the feature by using [slime-repl-ansi-color.el](https://github.com/enriquefernandez/slime-repl-ansi-color).
 
-After installing it, set `cl-test-more:*force-enable-colorize*` to `T` before running tests.
+After installing it, set `cl-test-more:*enable-colors*` to `T` before running tests.
 
 ### ASDF integration
 
@@ -265,7 +265,7 @@ Add `:defsystem-depends-on (:cl-test-more-asdf)` to your testing ASDF system to 
   :components
   ((:test-file "my-app"))
   :perform (test-op :after (op c)
-                    (funcall (intern #. (string :run-test-system) :cl-test-more)
+                    (funcall (intern #.(string :run-test-system) :cl-test-more)
                              c)))
 ```
 

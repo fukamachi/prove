@@ -18,11 +18,17 @@
        (format ,stream (cl-ansi-text::generate-color-string 0)))))
 
 (defmacro with-color ((color &rest args) &body body)
-  `(if *enable-colors*
-       (if (or (eq ,color :gray)
-               (eq ,color :grey)
-               (eq ,color cl-colors:+gray+)
-               (eq ,color cl-colors:+grey+))
-           (with-gray ,(or (getf args :stream) t) ,@body)
-           (cl-ansi-text:with-color (,color ,@args) ,@body))
-       (progn ,@body)))
+  (cond
+    ((or (eq color :gray)
+         (eq color :grey))
+     `(if *enable-colors*
+          (with-gray ,(or (getf args :stream) t) ,@body)
+          (progn ,@body)))
+    (T `(if *enable-colors*
+            (if (or (eq ,color :gray)
+                    (eq ,color :grey)
+                    (eq ,color cl-colors:+gray+)
+                    (eq ,color cl-colors:+grey+))
+                (with-gray ,(or (getf args :stream) t) ,@body)
+                (cl-ansi-text:with-color (,color ,@args) ,@body))
+            (progn ,@body)))))

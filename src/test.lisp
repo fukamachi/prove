@@ -103,7 +103,8 @@
       (values result report))))
 
 (defun ok (test &optional desc)
-  (test (not (null test)) t desc))
+  (test test t desc :test-fn (lambda (x y)
+                               (eq (not (null x)) y))))
 
 (defun is (got expected &rest args)
   (test got expected args))

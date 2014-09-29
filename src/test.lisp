@@ -183,10 +183,10 @@
     (add-report report (current-suite))
     (format-report (test-result-output) report nil)))
 
-(defun skip (how-many why)
+(defun skip (how-many why &rest format-args)
   (check-type how-many integer)
   (dotimes (i how-many)
-    (test t t why
+    (test t t (apply #'format nil why format-args)
       :passed-report-class 'skipped-test-report)))
 
 (defun pass (desc)

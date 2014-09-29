@@ -17,6 +17,7 @@
                 :expected
                 :description
                 :failed-report-p
+                :skipped-report-p
                 :test-report-p
                 :print-plan-report
                 :print-finalize-report)
@@ -44,7 +45,7 @@
                (eq got got-form)
                got)))))
 
-(defmethod format-report (stream (report passed-test-report) (style (eql :list)) &rest args)
+(defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
   (with-color-if-available (cl-colors:+green+ :stream stream)
@@ -66,10 +67,6 @@
       (when description
         (write-string description stream))))
   (terpri stream))
-
-(defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
-  (declare (ignore args))
-  (format-report stream (change-class report 'passed-test-report) style))
 
 (defmethod format-report (stream (report composed-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
@@ -93,6 +90,7 @@
 
 (defmethod print-finalize-report (stream plan reports (style (eql :list)))
   (let ((failed-count (count-if #'failed-report-p reports))
+        (skipped-count (count-if #'skipped-report-p reports))
         (count (count-if #'test-report-p reports)))
     (format/indent stream "~2&")
     (cond
@@ -114,4 +112,8 @@
         (with-color-if-available (cl-colors:+green+ :stream stream)
           (format/indent stream
                          "✓ ~D tests completed" count)))
-    (terpri stream)))
+    (terpri stream)
+    (unless (zerop skipped-count)
+      (with-color-if-available (cl-colors:+cyan+ :stream stream)
+        (format/indent stream "● ~D tests skipped" skipped-count))
+      (terpri stream))))

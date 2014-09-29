@@ -127,7 +127,7 @@ Checks if `got` matches a regular expression `regex`.
 (like "Hatsune 39" "\\d")
 ;->  ✓ "Hatsune 39" is expected to be like "\\d"
 
-(like "初音ミク "\\d")
+(like "初音ミク" "\\d")
 ;->  × "初音ミク" is expected to be like "\\d"
 ```
 

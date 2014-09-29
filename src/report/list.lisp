@@ -39,9 +39,7 @@
 (defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
-  (with-color ((if (skipped-report-p report)
-                   :cyan
-                   :green) :stream stream)
+  (with-color (:green :stream stream)
     (format stream "✓"))
   (let ((description (possible-report-description report))
         (duration (slot-value report 'duration)))
@@ -52,6 +50,17 @@
     (when duration
       (format stream " ")
       (print-duration stream duration (slot-value report 'slow-threshold))))
+  (terpri stream))
+
+(defmethod format-report (stream (report skipped-test-report) (style (eql :list)) &rest args)
+  (declare (ignore args))
+  (format/indent stream "~&  ")
+  (with-color (:cyan :stream stream)
+    (format stream "-")
+    (let ((description (possible-report-description report)))
+      (when description
+        (format stream " ")
+        (write-string description stream))))
   (terpri stream))
 
 (defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)

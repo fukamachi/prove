@@ -52,7 +52,8 @@
   (format stream " ")
   (let ((description (possible-report-description report)))
     (when description
-      (write-string description stream)))
+      (with-color-if-available (cl-colors:+gray+ :stream stream)
+        (write-string description stream))))
   (terpri stream))
 
 (defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)

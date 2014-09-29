@@ -102,18 +102,18 @@
             (not (= count plan)))
        (with-color-if-available (cl-colors:+yellow+ :stream stream)
          (format/indent stream
-                        "△ Looks like you planned ~A tests but ran ~A.~%"
+                        "△ Looks like you planned ~D test~:*~P but ran ~A.~%"
                         plan count))))
     (if (< 0 failed-count)
         (with-color-if-available (cl-colors:+red+ :stream stream)
           (format/indent stream
-                         "× ~D of ~D tests failed"
+                         "× ~D of ~D test~:*~P failed"
                          failed-count count))
         (with-color-if-available (cl-colors:+green+ :stream stream)
           (format/indent stream
-                         "✓ ~D tests completed" count)))
+                         "✓ ~D test~:*~P completed" count)))
     (terpri stream)
     (unless (zerop skipped-count)
       (with-color-if-available (cl-colors:+cyan+ :stream stream)
-        (format/indent stream "● ~D tests skipped" skipped-count))
+        (format/indent stream "● ~D test~:*~P skipped" skipped-count))
       (terpri stream))))

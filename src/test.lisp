@@ -180,13 +180,10 @@
                        *standard-output*
                        *test-result-output*) report nil)))
 
-(defun skip (how-many why &rest args)
+(defun skip (how-many why)
   (check-type how-many integer)
   (dotimes (i how-many)
-    (test t t (apply #'format nil
-                     (format nil "skip~:[~;~:* ~A~]"
-                             why)
-                     args)
+    (test t t why
       :passed-report-class 'skipped-test-report)))
 
 (defun pass (desc)

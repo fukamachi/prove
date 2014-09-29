@@ -5,6 +5,7 @@
                 :report
                 :test-report
                 :normal-test-report
+                :skipped-test-report
                 :comment-report
                 :passed-report-p
                 :failed-report-p
@@ -52,6 +53,13 @@
     (when (and (failed-report-p report)
                print-error-detail)
       (print-error-report stream report style))))
+
+(defmethod format-report (stream (report skipped-test-report) (style (eql :tap)) &key count)
+  (with-slots (description print-error-detail) report
+    (format/indent stream
+                   "~&ok~:[~;~:* ~D~] - skip~:[~;~:* ~A~]~%"
+                   count
+                   description)))
 
 (defmethod print-error-report (stream (report normal-test-report) (style (eql :tap)))
   (with-slots (got got-form expected notp report-expected-label) report

@@ -33,7 +33,9 @@
 (defun possible-report-description (report)
   (cond
     ((slot-value report 'description)
-     (format nil "~A" (slot-value report 'description)))
+     (format nil "~A~:[~; (Skipped)~]"
+             (slot-value report 'description)
+             (skipped-report-p report)))
     ((and (typep report 'normal-test-report)
           (slot-value report 'got-form))
      (with-slots (got got-form notp report-expected-label expected) report
@@ -48,7 +50,9 @@
 (defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
-  (with-color-if-available (cl-colors:+green+ :stream stream)
+  (with-color-if-available ((if (skipped-report-p report)
+                                cl-colors:+cyan+
+                                cl-colors:+green+) :stream stream)
     (format stream "✓"))
   (format stream " ")
   (let ((description (possible-report-description report)))
@@ -76,7 +80,9 @@
         (format stream "×")
         (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description)))
       (progn
-        (with-color-if-available (cl-colors:+green+ :stream stream)
+        (with-color-if-available ((if (skipped-report-p report)
+                                      cl-colors:+cyan+
+                                      cl-colors:+green+) :stream stream)
           (format stream "✓"))
         (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))))
   (terpri stream))

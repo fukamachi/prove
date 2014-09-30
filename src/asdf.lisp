@@ -22,6 +22,7 @@
 
 #+asdf3
 (defmethod asdf::compute-action-stamp :around (plan (o asdf:operation) (c test-file) &key just-done)
+  (declare (ignore just-done))
   (let ((*error-output* (make-broadcast-stream)))
     (call-next-method)))
 

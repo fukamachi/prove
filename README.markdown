@@ -6,8 +6,8 @@ The advantages of CL-TEST-MORE are:
 
 * Various simple functions for testing and informative error messages
 * [ASDF integration](#asdf-integration)
-* Extensible test reporters
-* Colorizes the report if it's available
+* [Extensible test reporters](#reporters)
+* Colorizes the report if it's available ([note for SLIME](#colorize-test-reports-on-slime))
 * Reports test durations
 
 ## Quickstart

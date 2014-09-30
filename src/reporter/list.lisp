@@ -16,22 +16,25 @@
                  stream "~&  ~A~%"
                  (slot-value report 'description)))
 
+(defun report-expected-line (report)
+  (when (and (typep report 'normal-test-report)
+             (slot-value report 'got-form))
+    (with-slots (got got-form notp report-expected-label expected) report
+      (format nil "~S is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~S~:[ (got ~S)~;~*~]"
+              got-form
+              notp
+              report-expected-label
+              expected
+              (eq got got-form)
+              got))))
+
 (defun possible-report-description (report)
   (cond
     ((slot-value report 'description)
      (format nil "~A~:[~; (Skipped)~]"
              (slot-value report 'description)
              (skipped-report-p report)))
-    ((and (typep report 'normal-test-report)
-          (slot-value report 'got-form))
-     (with-slots (got got-form notp report-expected-label expected) report
-       (format nil "~S is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~S~:[ (got ~S)~;~*~]"
-               got-form
-               notp
-               report-expected-label
-               expected
-               (eq got got-form)
-               got)))))
+    (T (report-expected-line report))))
 
 (defun print-duration (stream duration &optional slow-threshold)
   (let ((color (if slow-threshold
@@ -82,7 +85,10 @@
         (write-string description stream))
       (when duration
         (format stream " ")
-        (print-duration stream duration (slot-value report 'slow-threshold)))))
+        (print-duration stream duration (slot-value report 'slow-threshold))))
+    (when (slot-value report 'description)
+      (format/indent reporter stream "~&    ")
+      (format stream (report-expected-line report))))
   (terpri stream))
 
 (defmethod format-report (stream (reporter list-reporter) (report composed-test-report) &rest args)

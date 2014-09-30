@@ -3,7 +3,7 @@
   (:use :cl)
   (:import-from :cl-ansi-text
                 :generate-color-string)
-  (:export :*enable-colorize*
+  (:export :*enable-colors*
            :with-color))
 (in-package :cl-test-more.color)
 

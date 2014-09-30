@@ -18,11 +18,12 @@
                    (:file "reporter" :depends-on ("report"))
                    (:module "reporter-components"
                     :pathname "reporter"
-                    :depends-on ("report" "reporter")
+                    :depends-on ("report" "reporter" "color")
                     :components
                     ((:file "tap")
                      (:file "fiveam")
-                     (:file "list" :depends-on ("color"))))
+                     (:file "list")
+                     (:file "dot" :depends-on ("list"))))
                    (:file "suite" :depends-on ("output" "report" "reporter" "asdf"))
                    (:file "asdf" :depends-on ("output"))
                    (:file "color")

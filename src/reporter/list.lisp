@@ -4,7 +4,8 @@
         :cl-test-more.report
         :cl-test-more.reporter)
   (:import-from :cl-test-more.color
-                :with-color))
+                :with-color)
+  (:export :list-reporter))
 (in-package :cl-test-more.reporter.list)
 
 (defclass list-reporter (reporter) ())

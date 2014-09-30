@@ -297,7 +297,7 @@ To run tests, execute `asdf:test-system` or `cl-test-more:run-test-system` in yo
 
 ### Reporters
 
-You can change the test report formats by setting `cl-test-more:*report-style*` to `:list`, `:tap` or `:fiveam`. The default value is `:list`.
+You can change the test report formats by setting `cl-test-more:*report-style*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
 
 ### Changing default test function
 

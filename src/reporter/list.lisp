@@ -32,10 +32,12 @@
                (eq got got-form)
                got)))))
 
-(defun print-duration (stream duration slow-threshold)
-  (let ((color (cond
-                 ((< slow-threshold duration) :red)
-                 ((< (/ slow-threshold 2) duration) :yellow))))
+(defun print-duration (stream duration &optional slow-threshold)
+  (let ((color (if slow-threshold
+                   (cond
+                     ((< slow-threshold duration) :red)
+                     ((< (/ slow-threshold 2) duration) :yellow))
+                   :gray)))
     (when color
       (with-color (color :stream stream)
         (format stream "(~Dms)" duration)))))
@@ -115,6 +117,11 @@
         (with-color (:green :stream stream)
           (format/indent stream
                          "✓ ~D test~:*~P completed" count)))
+    (format stream " ")
+    (print-duration stream
+                    (reduce #'+
+                            (remove-if-not #'test-report-p reports)
+                            :key (lambda (report) (or (slot-value report 'duration) 0))))
     (terpri stream)
     (unless (zerop skipped-count)
       (with-color (:cyan :stream stream)

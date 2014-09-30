@@ -244,6 +244,34 @@ Set the threshold of slow test durations for the current test suite. The default
 (slow-threshold 150)
 ```
 
+## Reporters
+
+You can change the test report formats by setting `cl-test-more:*report-style*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
+
+### List (Default)
+
+The `:list` repoter outputs test results list as test cases pass or fail.
+
+![](images/list.png)
+
+### Dot
+
+The `:dot` reporter outputs a series of dots that represent test cases, failures highlight in red, skipping in cyan.
+
+![](images/dot.png)
+
+### FiveAM
+
+The `:fiveam` reporter outputs test results like [FiveAM](http://common-lisp.net/project/fiveam/) does.
+
+![](images/fiveam.png)
+
+### TAP
+
+The `:tap` reporter outputs in [Test Anything Protocol](http://testanything.org) format.
+
+![](images/tap.png)
+
 ## Tips
 
 ### Colorize test reports on SLIME
@@ -294,10 +322,6 @@ To run tests, execute `asdf:test-system` or `cl-test-more:run-test-system` in yo
 ;; Same to 'asdf:test-system' except it returns T or NIL as the result of tests.
 (cl-test-more:run-test-system :my-app)
 ```
-
-### Reporters
-
-You can change the test report formats by setting `cl-test-more:*report-style*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
 
 ### Changing default test function
 

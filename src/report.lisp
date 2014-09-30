@@ -1,9 +1,7 @@
 (in-package :cl-user)
 (defpackage cl-test-more.report
   (:use :cl)
-  (:export :*report-style*
-
-           :report
+  (:export :report
            :test-report
            :normal-test-report
            :passed-test-report
@@ -27,17 +25,10 @@
            :slow-threshold
            :print-error-detail
 
-           :print-error-report
-           :format-report
-           :print-plan-report
-           :print-finalize-report
-
            :*indent-level*
            :indent
            :format/indent))
 (in-package :cl-test-more.report)
-
-(defvar *report-style* :list)
 
 (defparameter *indent-level* 0)
 
@@ -131,25 +122,3 @@
             notp
             expected
             description)))
-
-(defgeneric print-error-report (stream report style)
-  (:method (stream (report report) style)
-    ;; Do nothing.
-    )
-  (:method (stream (report test-report) (style null))
-    (print-error-report stream report *report-style*)))
-
-(defgeneric format-report (stream report style &rest args)
-  (:method (stream (report report) (style null) &rest args)
-    (apply #'format-report stream report *report-style* args)))
-
-(defgeneric print-plan-report (stream num style)
-  (:method (stream num (style null))
-    (print-plan-report stream num *report-style*))
-  (:method (stream num (style t))
-    ;; Do nothing
-    (fresh-line stream)))
-
-(defgeneric print-finalize-report (stream plan reports style)
-  (:method (stream plan reports (style null))
-    (print-finalize-report stream plan reports *report-style*)))

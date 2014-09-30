@@ -1,22 +1,25 @@
 (in-package :cl-user)
-(defpackage cl-test-more.report.tap
+(defpackage cl-test-more.reporter.tap
   (:use :cl
-        :cl-test-more.report)
+        :cl-test-more.report
+        :cl-test-more.reporter)
   (:import-from :cl-test-more.color
                 :with-color))
-(in-package :cl-test-more.report.tap)
+(in-package :cl-test-more.reporter.tap)
 
-(defmethod format-report (stream (report report) (style (eql :tap)) &rest args)
+(defclass tap-reporter (reporter) ())
+
+(defmethod format-report (stream (reporter tap-reporter) (report report) &rest args)
   (declare (ignore args))
   (format/indent stream "~&~A~%"
                  (slot-value report 'description)))
 
-(defmethod format-report (stream (report comment-report) (style (eql :tap)) &rest args)
+(defmethod format-report (stream (reporter tap-reporter) (report comment-report) &rest args)
   (declare (ignore args))
   (format/indent stream "~&# ~A~%"
                  (slot-value report 'description)))
 
-(defmethod format-report (stream (report test-report) (style (eql :tap)) &key count)
+(defmethod format-report (stream (reporter tap-reporter) (report test-report) &key count)
   (with-slots (description print-error-detail) report
     (format/indent stream
                    "~&~:[not ~;~]ok~:[~;~:* ~D~]~:[~;~:* - ~A~]~%"
@@ -26,16 +29,16 @@
                    description)
     (when (and (failed-report-p report)
                print-error-detail)
-      (print-error-report stream report style))))
+      (print-error-report reporter report stream))))
 
-(defmethod format-report (stream (report skipped-test-report) (style (eql :tap)) &key count)
+(defmethod format-report (stream (reporter tap-reporter) (report skipped-test-report) &key count)
   (with-slots (description print-error-detail) report
     (format/indent stream
                    "~&ok~:[~;~:* ~D~] - skip~:[~;~:* ~A~]~%"
                    count
                    description)))
 
-(defmethod print-error-report (stream (report normal-test-report) (style (eql :tap)))
+(defmethod print-error-report ((reporter tap-reporter) (report normal-test-report) stream)
   (with-slots (got got-form expected notp report-expected-label) report
     (when (failed-report-p report)
       (format/indent stream
@@ -47,14 +50,14 @@
                      report-expected-label
                      expected))))
 
-(defmethod print-plan-report (stream num (style (eql :tap)))
+(defmethod print-plan-report ((reporter tap-reporter) num stream)
   (when num
     (format-report stream
+                   reporter
                    (make-instance 'report
-                                  :description (format nil "1..~A" num))
-                   :tap)))
+                                  :description (format nil "1..~A" num)))))
 
-(defmethod print-finalize-report (stream plan reports (style (eql :tap)))
+(defmethod print-finalize-report ((reporter tap-reporter) plan reports stream)
   (let ((failed-count (count-if #'failed-report-p reports))
         (count (count-if #'test-report-p reports)))
     (cond

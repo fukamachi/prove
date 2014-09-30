@@ -1,19 +1,22 @@
 (in-package :cl-user)
-(defpackage cl-test-more.report.fiveam
+(defpackage cl-test-more.reporter.fiveam
   (:use :cl
-        :cl-test-more.report))
-(in-package :cl-test-more.report.fiveam)
+        :cl-test-more.report
+        :cl-test-more.reporter))
+(in-package :cl-test-more.reporter.fiveam)
 
-(defmethod format-report (stream (report report) (style (eql :fiveam)) &rest args)
-  (declare (ignore args))
+(defclass fiveam-reporter (reporter) ())
+
+(defmethod format-report (stream (reporter fiveam-reporter) (report report) &rest args)
+  (declare (ignore stream reporter report args))
   ;; Do nothing. This reporter doesn't support 'diag'.
   )
 
-(defmethod format-report (stream (report test-report) (style (eql :fiveam)) &rest args)
+(defmethod format-report (stream (reporter fiveam-reporter) (report test-report) &rest args)
   (declare (ignore args))
   (write-char (if (failed-report-p report) #\f #\.) stream))
 
-(defmethod print-error-report (stream (report test-report) (style (eql :fiveam)))
+(defmethod print-error-report ((reporter fiveam-reporter) (report test-report) stream)
   (with-slots (description got got-form expected notp report-expected-label print-error-detail) report
     (cond
       ((passed-report-p report))
@@ -29,18 +32,18 @@
       (T (format/indent stream "~& ~:[(no description)~;~:*~A~]: Failed~%"
                         description)))))
 
-(defmethod print-error-report (stream (report composed-test-report) (style (eql :fiveam)))
+(defmethod print-error-report ((reporter fiveam-reporter) (report composed-test-report) stream)
   (with-slots (plan children description) report
     (format/indent stream "~& ~:[(no description)~;~:*~A~]:~%"
                    description)
     (let ((*indent-level* (1+ *indent-level*)))
-      (print-finalize-report stream plan children :fiveam))))
+      (print-finalize-report reporter plan children stream))))
 
-(defmethod print-error-report (stream (report comment-report) (style (eql :fiveam)))
+(defmethod print-error-report ((reporter fiveam-reporter) (report comment-report) stream)
   (format/indent stream "~& ~A~%"
                  (slot-value report 'description)))
 
-(defmethod print-finalize-report (stream plan reports (style (eql :fiveam)))
+(defmethod print-finalize-report ((reporter fiveam-reporter) plan reports stream)
   (let ((failed-count (count-if #'failed-report-p reports))
         (passed-count (count-if #'passed-report-p reports))
         (skipped-count (count-if #'skipped-report-p reports))
@@ -59,5 +62,5 @@
       (format/indent stream "~2& Failure Details:~% --------------------------------~%")
       (loop for report across reports
             when (failed-report-p report)
-              do (print-error-report stream report :fiveam)
+              do (print-error-report reporter report stream)
                  (format/indent stream " --------------------------------~%")))))

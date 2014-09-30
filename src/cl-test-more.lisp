@@ -30,7 +30,7 @@
                 :remove-test
                 :remove-test-all
                 :*gensym-prefix*)
-  (:import-from :cl-test-more.report
+  (:import-from :cl-test-more.reporter
                 :*report-style*)
   (:import-from :cl-test-more.suite
                 :*default-slow-threshold*

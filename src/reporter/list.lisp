@@ -1,12 +1,15 @@
 (in-package :cl-user)
-(defpackage cl-test-more.report.list
+(defpackage cl-test-more.reporter.list
   (:use :cl
-        :cl-test-more.report)
+        :cl-test-more.report
+        :cl-test-more.reporter)
   (:import-from :cl-test-more.color
                 :with-color))
-(in-package :cl-test-more.report.list)
+(in-package :cl-test-more.reporter.list)
 
-(defmethod format-report (stream (report report) (style (eql :list)) &rest args)
+(defclass list-reporter (reporter) ())
+
+(defmethod format-report (stream (reporter list-reporter) (report report) &rest args)
   (declare (ignore args))
   (format/indent stream "~&# ~A~2%"
                  (slot-value report 'description)))
@@ -36,7 +39,7 @@
       (with-color (color :stream stream)
         (format stream "(~Dms)" duration)))))
 
-(defmethod format-report (stream (report normal-test-report) (style (eql :list)) &rest args)
+(defmethod format-report (stream (reporter list-reporter) (report normal-test-report) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
   (with-color (:green :stream stream)
@@ -52,7 +55,7 @@
       (print-duration stream duration (slot-value report 'slow-threshold))))
   (terpri stream))
 
-(defmethod format-report (stream (report skipped-test-report) (style (eql :list)) &rest args)
+(defmethod format-report (stream (reporter list-reporter) (report skipped-test-report) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
   (with-color (:cyan :stream stream)
@@ -63,7 +66,7 @@
         (write-string description stream))))
   (terpri stream))
 
-(defmethod format-report (stream (report failed-test-report) (style (eql :list)) &rest args)
+(defmethod format-report (stream (reporter list-reporter) (report failed-test-report) &rest args)
   (declare (ignore args))
   (format/indent stream "~&  ")
   (with-color (:red :stream stream)
@@ -78,7 +81,7 @@
         (print-duration stream duration (slot-value report 'slow-threshold)))))
   (terpri stream))
 
-(defmethod format-report (stream (report composed-test-report) (style (eql :list)) &rest args)
+(defmethod format-report (stream (reporter list-reporter) (report composed-test-report) &rest args)
   (declare (ignore args))
   (flet ((print-duration-in-gray ()
            (when (slot-value report 'duration)
@@ -100,14 +103,14 @@
           (print-duration-in-gray))))
   (terpri stream))
 
-(defmethod print-plan-report (stream num (style (eql :list)))
+(defmethod print-plan-report ((reporter list-reporter) num stream)
   (when num
     (format-report stream
+                   reporter
                    (make-instance 'report
-                                  :description (format nil "1..~A" num))
-                   :list)))
+                                  :description (format nil "1..~A" num)))))
 
-(defmethod print-finalize-report (stream plan reports (style (eql :list)))
+(defmethod print-finalize-report ((reporter list-reporter) plan reports stream)
   (let ((failed-count (count-if #'failed-report-p reports))
         (skipped-count (count-if #'skipped-report-p reports))
         (count (count-if #'test-report-p reports)))

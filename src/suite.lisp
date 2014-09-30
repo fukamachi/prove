@@ -4,7 +4,8 @@
   (:import-from :cl-test-more.output
                 :test-result-output)
   (:import-from :cl-test-more.report
-                :report
+                :report)
+  (:import-from :cl-test-more.reporter
                 :print-plan-report
                 :print-finalize-report)
   (:import-from :cl-test-more.asdf
@@ -78,13 +79,11 @@
   (let ((suite (current-suite)))
     (setf (slot-value suite 'plan) num)
     (reset-suite suite))
-  (print-plan-report (test-result-output)
-                     num nil))
+  (print-plan-report nil num (test-result-output)))
 
 (defun finalize (&optional (suite (current-suite)))
   (with-slots (plan reports failed) suite
-    (print-finalize-report (test-result-output)
-                           plan reports nil)
+    (print-finalize-report nil plan reports (test-result-output))
     (setf *last-suite-report*
           (list :plan plan :failed failed))
     (zerop failed)))

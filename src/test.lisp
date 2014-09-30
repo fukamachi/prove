@@ -11,9 +11,10 @@
                 :comment-report
                 :composed-test-report
                 :failed-report-p
-                :format-report
                 :duration
                 :*indent-level*)
+  (:import-from :cl-test-more.reporter
+                :format-report)
   (:import-from :cl-test-more.suite
                 :suite
                 :*suite*
@@ -108,7 +109,7 @@
         (incf (failed suite)))
       (incf (test-count suite))
       (when output
-        (format-report (test-result-output) report nil :count (test-count suite)))
+        (format-report (test-result-output) nil report :count (test-count suite)))
       (values result report))))
 
 (defmacro with-duration (((duration result) form) &body body)
@@ -221,7 +222,7 @@
   (let ((report (make-instance 'comment-report
                                :description desc)))
     (add-report report (current-suite))
-    (format-report (test-result-output) report nil)))
+    (format-report (test-result-output) nil report)))
 
 (defun skip (how-many why &rest format-args)
   (check-type how-many integer)
@@ -251,7 +252,7 @@
         (suite (current-suite)))
     (add-report report suite)
     (incf (test-count suite))
-    (format-report (test-result-output) report nil :count (test-count suite))))
+    (format-report (test-result-output) nil report :count (test-count suite))))
 
 (defmacro subtest (desc &body body)
   `(%subtest ,desc (lambda () ,@body)))

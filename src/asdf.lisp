@@ -6,6 +6,7 @@
                 :*test-result-output*)
   (:export :test-file
            :run-test-system
+           :run
 
            :*last-suite-report*))
 (in-package :prove.asdf)
@@ -47,5 +48,9 @@
     (values (null failed-files)
             (nreverse passed-files)
             (nreverse failed-files))))
+
+(defun run (system)
+  "Run a test ASDF system. Shorter name of RUN-TEST-SYSTEM."
+  (run-test-system system))
 
 (import 'test-file :asdf)

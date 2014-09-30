@@ -6,7 +6,8 @@
                 :*test-result-output*)
   (:import-from :prove.asdf
                 :test-file
-                :run-test-system)
+                :run-test-system
+                :run)
   (:import-from :prove.test
                 :*default-test-function*
                 :ok
@@ -49,6 +50,7 @@
            :*report-style*
            :test-file
            :run-test-system
+           :run
            :ok
            :is
            :isnt

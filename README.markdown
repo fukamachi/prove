@@ -312,17 +312,17 @@ Add `:defsystem-depends-on (:prove-asdf)` to your testing ASDF system to enable 
   :components
   ((:test-file "my-app"))
   :perform (test-op :after (op c)
-                    (funcall (intern #.(string :run-test-system) :prove)
-                             c)))
+                    (funcall (intern #.(string :run) :prove) c)))
 ```
 
-To run tests, execute `asdf:test-system` or `prove:run-test-system` in your REPL.
+To run tests, execute `asdf:test-system` or `prove:run` in your REPL.
 
 ```common-lisp
 (asdf:test-system :my-app)
+(asdf:test-system :my-app-test)
 
-;; Same to 'asdf:test-system' except it returns T or NIL as the result of tests.
-(prove:run-test-system :my-app)
+;; Same as 'asdf:test-system' except it returns T or NIL as the result of tests.
+(prove:run :my-app-test)
 ```
 
 ### Changing default test function

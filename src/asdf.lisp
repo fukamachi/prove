@@ -33,7 +33,7 @@
   (unless (asdf:component-loaded-p system-designator)
     #+quicklisp (ql:quickload system-designator)
     #-quicklisp (asdf:load-system system-designator))
-  (let ((failed-files '()))
+  (let ((passed-files '()) (failed-files '()))
     (dolist (c (reverse
                 (gethash (asdf:find-system system-designator) *system-test-files*)))
       (setf *last-suite-report* nil)
@@ -41,9 +41,11 @@
       (asdf:perform (make-instance 'asdf:load-source-op) c)
       (unless *last-suite-report*
         (warn "Test completed without 'finalize'd."))
-      (unless (eql (getf *last-suite-report* :failed) 0)
-        (push (asdf:component-pathname c) failed-files)))
+      (if (eql (getf *last-suite-report* :failed) 0)
+          (push (asdf:component-pathname c) passed-files)
+          (push (asdf:component-pathname c) failed-files)))
     (values (null failed-files)
+            (nreverse passed-files)
             (nreverse failed-files))))
 
 (import 'test-file :asdf)

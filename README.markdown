@@ -36,9 +36,10 @@ The advantages of 'prove' are:
 
 ```common-lisp
 (prove:run #P"myapp/tests/my-test.lisp")
+(prove:run #P"myapp/tests/my-test.lisp" :reporter :list)
 ```
 
-See also: [ASDF integration](#asdf-integration)
+See also: [ASDF integration](#asdf-integration), [Reporters](#reporters)
 
 ### 3. Get a report
 
@@ -248,7 +249,9 @@ Set the threshold of slow test durations for the current test suite. The default
 
 ## Reporters
 
-You can change the test report formats by setting `prove:*report-style*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
+You can change the test report formats by setting `prove:*default-reporter*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
+
+`prove:run` also takes a keyword argument `:reporter`.
 
 ### List (Default)
 

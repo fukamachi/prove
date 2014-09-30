@@ -12,10 +12,10 @@
                :alexandria)
   :components ((:module "src"
                 :components
-                ((:file "prove" :depends-on ("test" "suite" "reporter" "asdf" "color"))
+                ((:file "prove" :depends-on ("output" "test" "suite" "asdf" "color"))
                  (:file "test" :depends-on ("output" "report" "reporter" "suite"))
                  (:file "report")
-                 (:file "reporter" :depends-on ("report"))
+                 (:file "reporter" :depends-on ("report" "output"))
                  (:module "reporter-components"
                   :pathname "reporter"
                   :depends-on ("report" "reporter" "color")

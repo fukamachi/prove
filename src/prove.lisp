@@ -3,7 +3,8 @@
   (:nicknames :cl-test-more :test-more)
   (:use :cl)
   (:import-from :prove.output
-                :*test-result-output*)
+                :*test-result-output*
+                :*default-reporter*)
   (:import-from :prove.asdf
                 :test-file
                 :run-test-system
@@ -31,8 +32,6 @@
                 :remove-test
                 :remove-test-all
                 :*gensym-prefix*)
-  (:import-from :prove.reporter
-                :*report-style*)
   (:import-from :prove.suite
                 :*default-slow-threshold*
                 :slow-threshold
@@ -47,7 +46,7 @@
                 :*enable-colors*)
   (:export :*test-result-output*
            :*default-test-function*
-           :*report-style*
+           :*default-reporter*
            :test-file
            :run-test-system
            :run

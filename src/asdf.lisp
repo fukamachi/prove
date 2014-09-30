@@ -3,7 +3,8 @@
   (:use :cl
         :asdf)
   (:import-from :prove.output
-                :*test-result-output*)
+                :*test-result-output*
+                :*default-reporter*)
   (:export :test-file
            :run-test-system
            :run
@@ -68,7 +69,7 @@
                  #-asdf3 asdf::directory-files dir "*.lisp"))
               (nreverse directories)))))
 
-(defun run (object)
+(defun run (object &key (reporter *default-reporter*))
   "Runs a test. OBJECT can be one of a file pathname, a directory pathname or an ASDF system name.
 Returns 3 multiple-values, a flag if the tests passed as T or NIL, passed test files as a list and failed test files also as a list.
 
@@ -77,32 +78,34 @@ Example:
   (prove:run #P\"myapp/tests/\")
   (prove:run #P\"myapp/tests/01-main.lisp\")
 "
+  (check-type reporter keyword)
   (flet ((directory-pathname-p (path)
            (string= (file-namestring path) "")))
-    (cond
-      ((and (stringp object)
-            (asdf:find-system object nil))
-       (run-test-system object))
-      ((stringp object)
-       (run (pathname object)))
-      ((and (pathnamep object)
-            (directory-pathname-p object))
-       (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '()))
-         (dolist (file (test-files-in-directory object))
-           (multiple-value-bind (passedp passed-files failed-files)
-               (run file)
-             (setf all-passed-files (append all-passed-files passed-files))
-             (setf all-failed-files (append all-failed-files failed-files))
-             (unless passedp
-               (setf all-passed-p nil))))
-         (values all-passed-p all-passed-files all-failed-files)))
-      ((pathnamep object)
-       (load object)
-       (unless *last-suite-report*
-         (warn "Test completed without 'finalize'd."))
-       (if (eql (getf *last-suite-report* :failed) 0)
-           (values T (list object) '())
-           (values NIL '() (list object))))
-      (T (run-test-system object)))))
+    (let ((*default-reporter* reporter))
+      (cond
+        ((and (stringp object)
+              (asdf:find-system object nil))
+         (run-test-system object))
+        ((stringp object)
+         (run (pathname object)))
+        ((and (pathnamep object)
+              (directory-pathname-p object))
+         (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '()))
+           (dolist (file (test-files-in-directory object))
+             (multiple-value-bind (passedp passed-files failed-files)
+                 (run file)
+               (setf all-passed-files (append all-passed-files passed-files))
+               (setf all-failed-files (append all-failed-files failed-files))
+               (unless passedp
+                 (setf all-passed-p nil))))
+           (values all-passed-p all-passed-files all-failed-files)))
+        ((pathnamep object)
+         (load object)
+         (unless *last-suite-report*
+           (warn "Test completed without 'finalize'd."))
+         (if (eql (getf *last-suite-report* :failed) 0)
+             (values T (list object) '())
+             (values NIL '() (list object))))
+        (T (run-test-system object))))))
 
 (import 'test-file :asdf)

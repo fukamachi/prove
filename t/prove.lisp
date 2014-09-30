@@ -4,7 +4,7 @@
         :prove))
 (in-package :t.prove)
 
-(setf *report-style* :dot)
+(setf *default-reporter* :list)
 
 (plan 10)
 

@@ -5,11 +5,12 @@
                 :report
                 :test-report
                 :description)
+  (:import-from :prove.output
+                :*default-reporter*)
   (:export :*indent-level*
            :indent-space
            :format/indent
 
-           :*report-style*
            :reporter
            :format-report
            :print-error-report
@@ -33,8 +34,6 @@
                                              (format nil "\\1~A" (indent indent-space)))
                     destination))))
 
-(defvar *report-style* :list)
-
 (defclass reporter ()
   ((indent-space :initform 2)))
 
@@ -50,7 +49,7 @@
   (:method (stream (reporter null) (report report) &rest args)
     (apply #'format-report
            stream
-           (find-reporter *report-style*)
+           (find-reporter *default-reporter*)
            report
            args))
   (:method (stream (reporter reporter) (report report) &rest args)
@@ -63,11 +62,11 @@
     ;; Do nothing.
     )
   (:method ((reporter null) (report test-report) stream)
-    (print-error-report (find-reporter *report-style*) report stream)))
+    (print-error-report (find-reporter *default-reporter*) report stream)))
 
 (defgeneric print-plan-report (reporter num stream)
   (:method ((reporter null) num stream)
-    (print-plan-report (find-reporter *report-style*) num stream))
+    (print-plan-report (find-reporter *default-reporter*) num stream))
   (:method ((reporter t) num stream)
     (declare (ignore reporter num))
     ;; Do nothing
@@ -75,7 +74,7 @@
 
 (defgeneric print-finalize-report (reporter plan reports stream)
   (:method ((reporter null) plan reports  stream)
-    (print-finalize-report (find-reporter *report-style*)
+    (print-finalize-report (find-reporter *default-reporter*)
                            plan
                            reports
                            stream)))

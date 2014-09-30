@@ -4,9 +4,12 @@
   (:import-from :prove.report
                 :report
                 :test-report
-                :description
-                :format/indent)
-  (:export :*report-style*
+                :description)
+  (:export :*indent-level*
+           :indent-space
+           :format/indent
+
+           :*report-style*
            :reporter
            :format-report
            :print-error-report
@@ -14,9 +17,26 @@
            :print-finalize-report))
 (in-package :prove.reporter)
 
+(defparameter *indent-level* 0)
+
+(defun indent (space &optional (count *indent-level*))
+  (make-string (* count space) :initial-element #\Space))
+
+(defun format/indent (reporter destination control-string &rest format-arguments)
+  (let ((output (apply #'format nil control-string format-arguments)))
+    (when (ppcre:scan "^~&" control-string)
+      (fresh-line destination))
+    (with-slots (indent-space) reporter
+      (format destination (indent indent-space))
+      (write-string (ppcre:regex-replace-all "(\\n)(?!$)"
+                                             output
+                                             (format nil "\\1~A" (indent indent-space)))
+                    destination))))
+
 (defvar *report-style* :list)
 
-(defclass reporter () ())
+(defclass reporter ()
+  ((indent-space :initform 2)))
 
 (defun find-reporter (name)
   (make-instance
@@ -35,7 +55,7 @@
            args))
   (:method (stream (reporter reporter) (report report) &rest args)
     (declare (ignore args))
-    (format/indent stream "~&~A~%"
+    (format/indent reporter stream "~&~A~%"
                    (slot-value report 'description))))
 
 (defgeneric print-error-report (reporter report stream)

@@ -25,27 +25,8 @@
            :report-expected-label
            :duration
            :slow-threshold
-           :print-error-detail
-
-           :*indent-level*
-           :indent
-           :format/indent))
+           :print-error-detail))
 (in-package :prove.report)
-
-(defparameter *indent-level* 0)
-
-(defun indent (&optional (count *indent-level*))
-  (make-string (* count 4) :initial-element #\Space))
-
-(defun format/indent (destination control-string &rest format-arguments)
-  (let ((output (apply #'format nil control-string format-arguments)))
-    (when (ppcre:scan "^~&" control-string)
-      (fresh-line destination))
-    (format destination (indent))
-    (write-string (ppcre:regex-replace-all "(\\n)(?!$)"
-                                           output
-                                           (format nil "\\1~A" (indent)))
-                  destination)))
 
 (defclass report ()
   ((description :type (or null string)

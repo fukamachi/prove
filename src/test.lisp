@@ -11,10 +11,10 @@
                 :comment-report
                 :composed-test-report
                 :failed-report-p
-                :duration
-                :*indent-level*)
+                :duration)
   (:import-from :prove.reporter
-                :format-report)
+                :format-report
+                :*indent-level*)
   (:import-from :prove.suite
                 :suite
                 :*suite*

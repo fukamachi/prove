@@ -12,7 +12,8 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report comment-report) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ~A~%"
+  (format/indent reporter
+                 stream "~&  ~A~%"
                  (slot-value report 'description)))
 
 (defun possible-report-description (report)
@@ -44,7 +45,7 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report normal-test-report) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
+  (format/indent reporter stream "~&  ")
   (with-color (:green :stream stream)
     (format stream "✓"))
   (let ((description (possible-report-description report))
@@ -60,7 +61,7 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report skipped-test-report) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
+  (format/indent reporter stream "~&  ")
   (with-color (:cyan :stream stream)
     (format stream "-")
     (let ((description (possible-report-description report)))
@@ -71,7 +72,7 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report failed-test-report) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&  ")
+  (format/indent reporter stream "~&  ")
   (with-color (:red :stream stream)
     (format stream "×")
     (let ((description (possible-report-description report))
@@ -91,31 +92,31 @@
 
 (defmethod print-plan-report ((reporter list-reporter) num stream)
   (when (numberp num)
-    (format/indent stream "~&1..~A~2%" num)))
+    (format/indent reporter stream "~&1..~A~2%" num)))
 
 (defmethod print-finalize-report ((reporter list-reporter) plan reports stream)
   (let ((failed-count (count-if #'failed-report-p reports))
         (skipped-count (count-if #'skipped-report-p reports))
         (count (count-if #'test-report-p reports)))
-    (format/indent stream "~2&")
+    (format/indent reporter stream "~2&")
     (cond
       ((eq plan :unspecified)
        (with-color (:yellow :stream stream)
-         (format/indent stream
+         (format/indent reporter stream
                         "△ Tests were run but no plan was declared.~%")))
       ((and plan
             (not (= count plan)))
        (with-color (:yellow :stream stream)
-         (format/indent stream
+         (format/indent reporter stream
                         "△ Looks like you planned ~D test~:*~P but ran ~A.~%"
                         plan count))))
     (if (< 0 failed-count)
         (with-color (:red :stream stream)
-          (format/indent stream
+          (format/indent reporter stream
                          "× ~D of ~D test~:*~P failed"
                          failed-count count))
         (with-color (:green :stream stream)
-          (format/indent stream
+          (format/indent reporter stream
                          "✓ ~D test~:*~P completed" count)))
     (format stream " ")
     (print-duration stream
@@ -125,5 +126,5 @@
     (terpri stream)
     (unless (zerop skipped-count)
       (with-color (:cyan :stream stream)
-        (format/indent stream "● ~D test~:*~P skipped" skipped-count))
+        (format/indent reporter stream "● ~D test~:*~P skipped" skipped-count))
       (terpri stream))))

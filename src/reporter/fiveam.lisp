@@ -21,7 +21,8 @@
   (with-slots (description got got-form expected notp report-expected-label print-error-detail) report
     (cond
       (print-error-detail
-       (format/indent stream "~& ~:[(no description)~;~:*~A~]:~%    ~S~:[~*~; => ~S~]~%        is ~:[~;not ~]expected to ~:[be~;~:*~A~]~%    ~S~%"
+       (format/indent reporter
+                      stream "~& ~:[(no description)~;~:*~A~]:~%    ~S~:[~*~; => ~S~]~%        is ~:[~;not ~]expected to ~:[be~;~:*~A~]~%    ~S~%"
                       description
                       got-form
                       (not (eq got got-form))
@@ -29,18 +30,18 @@
                       notp
                       report-expected-label
                       expected))
-      (T (format/indent stream "~& ~:[(no description)~;~:*~A~]: Failed~%"
+      (T (format/indent reporter stream "~& ~:[(no description)~;~:*~A~]: Failed~%"
                         description)))))
 
 (defmethod print-error-report ((reporter fiveam-reporter) (report composed-test-report) stream)
   (with-slots (plan children description) report
-    (format/indent stream "~& ~:[(no description)~;~:*~A~]:~%"
+    (format/indent reporter stream "~& ~:[(no description)~;~:*~A~]:~%"
                    description)
     (let ((*indent-level* (1+ *indent-level*)))
       (print-finalize-report reporter plan children stream))))
 
 (defmethod print-error-report ((reporter fiveam-reporter) (report comment-report) stream)
-  (format/indent stream "~& ~A~%"
+  (format/indent reporter stream "~& ~A~%"
                  (slot-value report 'description)))
 
 (defmethod print-finalize-report ((reporter fiveam-reporter) plan reports stream)
@@ -48,19 +49,23 @@
         (passed-count (count-if #'passed-report-p reports))
         (skipped-count (count-if #'skipped-report-p reports))
         (count (count-if #'test-report-p reports)))
-    (format/indent stream
+    (format/indent reporter stream
                    "~& Did ~D checks.~:[~*~; (planned ~D tests)~]~%"
                    count
                    (not (eql plan count))
                    plan)
     (unless (zerop count)
-      (format/indent stream "    Pass: ~D (~3D%)~%" passed-count (round (* (/ passed-count count) 100)))
+      (format/indent reporter
+                     stream "    Pass: ~D (~3D%)~%" passed-count (round (* (/ passed-count count) 100)))
       (unless (zerop skipped-count)
-        (format/indent stream "    Skip: ~D (~3D%)~%" skipped-count (round (* (/ skipped-count count) 100))))
-      (format/indent stream "    Fail: ~D (~3D%)~%" failed-count (round (* (/ failed-count count) 100))))
+        (format/indent reporter
+                       stream "    Skip: ~D (~3D%)~%" skipped-count (round (* (/ skipped-count count) 100))))
+      (format/indent reporter
+                     stream "    Fail: ~D (~3D%)~%" failed-count (round (* (/ failed-count count) 100))))
     (unless (zerop failed-count)
-      (format/indent stream "~2& Failure Details:~% --------------------------------~%")
+      (format/indent reporter
+                     stream "~2& Failure Details:~% --------------------------------~%")
       (loop for report across reports
             when (failed-report-p report)
               do (print-error-report reporter report stream)
-                 (format/indent stream " --------------------------------~%")))))
+                 (format/indent reporter stream " --------------------------------~%")))))

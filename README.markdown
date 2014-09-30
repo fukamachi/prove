@@ -35,7 +35,7 @@ The advantages of 'prove' are:
 ### 2. Run a test file
 
 ```common-lisp
-(load #P"/path/to/my-test.lisp")
+(prove:run #P"myapp/tests/my-test.lisp")
 ```
 
 See also: [ASDF integration](#asdf-integration)

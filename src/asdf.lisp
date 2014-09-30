@@ -31,6 +31,7 @@
   (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
 
 (defun run-test-system (system-designator)
+  "Runs a testing ASDF system."
   (unless (asdf:component-loaded-p system-designator)
     #+quicklisp (ql:quickload system-designator)
     #-quicklisp (asdf:load-system system-designator))
@@ -49,8 +50,59 @@
             (nreverse passed-files)
             (nreverse failed-files))))
 
-(defun run (system)
-  "Run a test ASDF system. Shorter name of RUN-TEST-SYSTEM."
-  (run-test-system system))
+(defun test-files-in-directory (directory)
+  (check-type directory pathname)
+  (flet ((always-true (&rest args)
+           (declare (ignore args))
+           T))
+    (let ((directories '()))
+      (#+asdf3 uiop:collect-sub*directories
+       #-asdf3 asdf::collect-sub*directories
+       directory
+       #'always-true
+       #'always-true
+       (lambda (dir)
+         (push dir directories)))
+      (mapcan (lambda (dir)
+                (#+asdf3 uiop:directory-files
+                 #-asdf3 asdf::directory-files dir "*.lisp"))
+              (nreverse directories)))))
+
+(defun run (object)
+  "Runs a test. OBJECT can be one of a file pathname, a directory pathname or an ASDF system name.
+Returns 3 multiple-values, a flag if the tests passed as T or NIL, passed test files as a list and failed test files also as a list.
+
+Example:
+  (prove:run :myapp-test)
+  (prove:run #P\"myapp/tests/\")
+  (prove:run #P\"myapp/tests/01-main.lisp\")
+"
+  (flet ((directory-pathname-p (path)
+           (string= (file-namestring path) "")))
+    (cond
+      ((and (stringp object)
+            (asdf:find-system object nil))
+       (run-test-system object))
+      ((stringp object)
+       (run (pathname object)))
+      ((and (pathnamep object)
+            (directory-pathname-p object))
+       (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '()))
+         (dolist (file (test-files-in-directory object))
+           (multiple-value-bind (passedp passed-files failed-files)
+               (run file)
+             (setf all-passed-files (append all-passed-files passed-files))
+             (setf all-failed-files (append all-failed-files failed-files))
+             (unless passedp
+               (setf all-passed-p nil))))
+         (values all-passed-p all-passed-files all-failed-files)))
+      ((pathnamep object)
+       (load object)
+       (unless *last-suite-report*
+         (warn "Test completed without 'finalize'd."))
+       (if (eql (getf *last-suite-report* :failed) 0)
+           (values T (list object) '())
+           (values NIL '() (list object))))
+      (T (run-test-system object)))))
 
 (import 'test-file :asdf)

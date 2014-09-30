@@ -30,6 +30,9 @@
   (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
 
 (defun run-test-system (system-designator)
+  (unless (asdf:component-loaded-p system-designator)
+    #+quicklisp (ql:quickload system-designator)
+    #-quicklisp (asdf:load-system system-designator))
   (let ((failed-files '()))
     (dolist (c (reverse
                 (gethash (asdf:find-system system-designator) *system-test-files*)))

@@ -1,9 +1,9 @@
 (in-package :cl-user)
-(defpackage cl-test-more.reporter.fiveam
+(defpackage prove.reporter.fiveam
   (:use :cl
-        :cl-test-more.report
-        :cl-test-more.reporter))
-(in-package :cl-test-more.reporter.fiveam)
+        :prove.report
+        :prove.reporter))
+(in-package :prove.reporter.fiveam)
 
 (defclass fiveam-reporter (reporter) ())
 

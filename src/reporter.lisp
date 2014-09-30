@@ -1,7 +1,7 @@
 (in-package :cl-user)
-(defpackage cl-test-more.reporter
+(defpackage prove.reporter
   (:use :cl)
-  (:import-from :cl-test-more.report
+  (:import-from :prove.report
                 :report
                 :test-report
                 :description
@@ -12,7 +12,7 @@
            :print-error-report
            :print-plan-report
            :print-finalize-report))
-(in-package :cl-test-more.reporter)
+(in-package :prove.reporter)
 
 (defvar *report-style* :list)
 
@@ -22,7 +22,7 @@
   (make-instance
    (intern (format nil "~A-~A" name #.(string :reporter))
            (intern (format nil "~A.~A"
-                           #.(string :cl-test-more.reporter)
+                           #.(string :prove.reporter)
                            name)
                    :keyword))))
 

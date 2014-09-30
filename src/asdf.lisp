@@ -1,14 +1,14 @@
 (in-package :cl-user)
-(defpackage cl-test-more.asdf
+(defpackage prove.asdf
   (:use :cl
         :asdf)
-  (:import-from :cl-test-more.output
+  (:import-from :prove.output
                 :*test-result-output*)
   (:export :test-file
            :run-test-system
 
            :*last-suite-report*))
-(in-package :cl-test-more.asdf)
+(in-package :prove.asdf)
 
 (defvar *last-suite-report* nil)
 

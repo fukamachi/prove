@@ -1,8 +1,10 @@
-# CL-TEST-MORE
+# prove
 
-CL-TEST-MORE is yet another unit testing framework for Common Lisp, inspired by Test::More, a module of Perl.
+_This project was originally called 'CL-TEST-MORE'._
 
-The advantages of CL-TEST-MORE are:
+'prove' is yet another unit testing framework for Common Lisp.
+
+The advantages of 'prove' are:
 
 * Various simple functions for testing and informative error messages
 * [ASDF integration](#asdf-integration)
@@ -18,7 +20,7 @@ The advantages of CL-TEST-MORE are:
 (in-package :cl-user)
 (defpackage my-test
   (:use :cl
-        :cl-test-more))
+        :prove))
 (in-package :my-test)
 
 (plan 3)
@@ -46,10 +48,10 @@ See also: [ASDF integration](#asdf-integration)
 
 ## Installation
 
-You can install CL-TEST-MORE via [Quicklisp](http://www.quicklisp.org/beta/).
+You can install 'prove' via [Quicklisp](http://www.quicklisp.org/beta/).
 
 ```common-lisp
-(ql:quickload :cl-test-more)
+(ql:quickload :prove)
 ```
 
 ## Testing functions
@@ -238,7 +240,7 @@ Finalizes the current test suite and outputs the test reports.
 
 ### (slow-threshold milliseconds)
 
-Set the threshold of slow test durations for the current test suite. The default threshold value is `cl-test-more:*default-slow-threshold*`.
+Set the threshold of slow test durations for the current test suite. The default threshold value is `prove:*default-slow-threshold*`.
 
 ```common-lisp
 (slow-threshold 150)
@@ -246,7 +248,7 @@ Set the threshold of slow test durations for the current test suite. The default
 
 ## Reporters
 
-You can change the test report formats by setting `cl-test-more:*report-style*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
+You can change the test report formats by setting `prove:*report-style*` to `:list`, `:dot`, `:tap` or `:fiveam`. The default value is `:list`.
 
 ### List (Default)
 
@@ -280,17 +282,17 @@ SLIME doesn't support to color with ANSI colors in the REPL buffer officially.
 
 You can add the feature by using [slime-repl-ansi-color.el](https://github.com/enriquefernandez/slime-repl-ansi-color).
 
-After installing it, set `cl-test-more:*enable-colors*` to `T` before running tests.
+After installing it, set `prove:*enable-colors*` to `T` before running tests.
 
 ```common-lisp
 ;; A part of my ~/.sbclrc
-(ql:quickload :cl-test-more)
-(setf cl-test-more:*enable-colors* t)
+(ql:quickload :prove)
+(setf prove:*enable-colors* t)
 ```
 
 ### ASDF integration
 
-Add `:defsystem-depends-on (:cl-test-more-asdf)` to your testing ASDF system to enable `:test-file` in the `:components`.
+Add `:defsystem-depends-on (:prove-asdf)` to your testing ASDF system to enable `:test-file` in the `:components`.
 
 `:test-file` is same as `:file` except it will be loaded only when `asdf:test-system`.
 
@@ -305,33 +307,33 @@ Add `:defsystem-depends-on (:cl-test-more-asdf)` to your testing ASDF system to 
 ;; Testing ASDF system
 (defsystem my-app-test
   :depends-on (:my-app
-               :cl-test-more)
-  :defsystem-depends-on (:cl-test-more-asdf)
+               :prove)
+  :defsystem-depends-on (:prove-asdf)
   :components
   ((:test-file "my-app"))
   :perform (test-op :after (op c)
-                    (funcall (intern #.(string :run-test-system) :cl-test-more)
+                    (funcall (intern #.(string :run-test-system) :prove)
                              c)))
 ```
 
-To run tests, execute `asdf:test-system` or `cl-test-more:run-test-system` in your REPL.
+To run tests, execute `asdf:test-system` or `prove:run-test-system` in your REPL.
 
 ```common-lisp
 (asdf:test-system :my-app)
 
 ;; Same to 'asdf:test-system' except it returns T or NIL as the result of tests.
-(cl-test-more:run-test-system :my-app)
+(prove:run-test-system :my-app)
 ```
 
 ### Changing default test function
 
-Test functions like `is` uses `cl-test-more:*default-test-function*` for testing if no `:test` argument is specified. The default value is `#'equal`.
+Test functions like `is` uses `prove:*default-test-function*` for testing if no `:test` argument is specified. The default value is `#'equal`.
 
 ### Changing output stream
 
-Test reports will be output to `cl-test-more:*test-result-output*`. The default value is `T`, which means `*standard-output*`.
+Test reports will be output to `prove:*test-result-output*`. The default value is `T`, which means `*standard-output*`.
 
-## Projects using CL-TEST-MORE
+## Projects using 'prove' (or CL-TEST-MORE, the old name of 'prove')
 
 * [Clack](https://github.com/fukamachi/clack)
 * [CL-DBI](https://github.com/fukamachi/cl-dbi)
@@ -341,10 +343,9 @@ Test reports will be output to `cl-test-more:*test-result-output*`. The default 
 
 ## Bugs
 
-Please report any bugs to e.arrows@gmail.com, or post an issue to [GitHub](http://github.com/fukamachi/cl-test-more/issues).
+Please report any bugs to e.arrows@gmail.com, or post an issue to [GitHub](http://github.com/fukamachi/prove/issues).
 
 ## License
 
 Copyright (c) 2010-2014 Eitaro Fukamachi &lt;e.arrows@gmail.com&gt;  
-CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).
-
+'prove' and CL-TEST-MORE is freely distributable under the MIT License (http://www.opensource.org/licenses/mit-license).

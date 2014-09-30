@@ -1,14 +1,14 @@
 (in-package :cl-user)
-(defpackage cl-test-more.suite
+(defpackage prove.suite
   (:use :cl)
-  (:import-from :cl-test-more.output
+  (:import-from :prove.output
                 :test-result-output)
-  (:import-from :cl-test-more.report
+  (:import-from :prove.report
                 :report)
-  (:import-from :cl-test-more.reporter
+  (:import-from :prove.reporter
                 :print-plan-report
                 :print-finalize-report)
-  (:import-from :cl-test-more.asdf
+  (:import-from :prove.asdf
                 :*last-suite-report*)
   (:export :*suite*
 
@@ -26,7 +26,7 @@
            :add-report
            :plan
            :finalize))
-(in-package :cl-test-more.suite)
+(in-package :prove.suite)
 
 (defparameter *suite* nil)
 (defparameter *default-slow-threshold* 75)

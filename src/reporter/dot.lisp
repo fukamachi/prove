@@ -1,11 +1,11 @@
 (in-package :cl-user)
-(defpackage cl-test-more.reporter.dot
+(defpackage prove.reporter.dot
   (:use :cl
-        :cl-test-more.report
-        :cl-test-more.reporter
-        :cl-test-more.reporter.list
-        :cl-test-more.color))
-(in-package :cl-test-more.reporter.dot)
+        :prove.report
+        :prove.reporter
+        :prove.reporter.list
+        :prove.color))
+(in-package :prove.reporter.dot)
 
 (defclass dot-reporter (list-reporter) ())
 

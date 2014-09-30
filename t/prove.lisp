@@ -1,8 +1,8 @@
 (in-package :cl-user)
-(defpackage t.cl-test-more
+(defpackage t.prove
   (:use :cl
-        :cl-test-more))
-(in-package :t.cl-test-more)
+        :prove))
+(in-package :t.prove)
 
 (setf *report-style* :dot)
 

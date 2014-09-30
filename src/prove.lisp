@@ -1,13 +1,13 @@
 (in-package :cl-user)
-(defpackage cl-test-more
-  (:nicknames :test-more)
+(defpackage prove
+  (:nicknames :cl-test-more :test-more)
   (:use :cl)
-  (:import-from :cl-test-more.output
+  (:import-from :prove.output
                 :*test-result-output*)
-  (:import-from :cl-test-more.asdf
+  (:import-from :prove.asdf
                 :test-file
                 :run-test-system)
-  (:import-from :cl-test-more.test
+  (:import-from :prove.test
                 :*default-test-function*
                 :ok
                 :is
@@ -30,9 +30,9 @@
                 :remove-test
                 :remove-test-all
                 :*gensym-prefix*)
-  (:import-from :cl-test-more.reporter
+  (:import-from :prove.reporter
                 :*report-style*)
-  (:import-from :cl-test-more.suite
+  (:import-from :prove.suite
                 :*default-slow-threshold*
                 :slow-threshold
                 :plan
@@ -42,7 +42,7 @@
                 :reset-suite
                 :suite
                 :package-suite)
-  (:import-from :cl-test-more.color
+  (:import-from :prove.color
                 :*enable-colors*)
   (:export :*test-result-output*
            :*default-test-function*

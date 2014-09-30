@@ -1,9 +1,9 @@
 (in-package :cl-user)
-(defpackage cl-test-more.output
+(defpackage prove.output
   (:use :cl)
   (:export :*test-result-output*
            :test-result-output))
-(in-package :cl-test-more.output)
+(in-package :prove.output)
 
 (defvar *test-result-output* t)
 

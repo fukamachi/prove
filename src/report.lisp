@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage cl-test-more.report
+(defpackage prove.report
   (:use :cl)
   (:export :report
            :test-report
@@ -30,7 +30,7 @@
            :*indent-level*
            :indent
            :format/indent))
-(in-package :cl-test-more.report)
+(in-package :prove.report)
 
 (defparameter *indent-level* 0)
 

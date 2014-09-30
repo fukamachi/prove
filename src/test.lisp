@@ -1,9 +1,9 @@
 (in-package :cl-user)
-(defpackage cl-test-more.test
+(defpackage prove.test
   (:use :cl)
-  (:import-from :cl-test-more.output
+  (:import-from :prove.output
                 :test-result-output)
-  (:import-from :cl-test-more.report
+  (:import-from :prove.report
                 :test-report-p
                 :passed-test-report
                 :failed-test-report
@@ -13,9 +13,9 @@
                 :failed-report-p
                 :duration
                 :*indent-level*)
-  (:import-from :cl-test-more.reporter
+  (:import-from :prove.reporter
                 :format-report)
-  (:import-from :cl-test-more.suite
+  (:import-from :prove.suite
                 :suite
                 :*suite*
                 :suite-plan
@@ -53,7 +53,7 @@
            :run-test-all
            :remove-test
            :remove-test-all))
-(in-package :cl-test-more.test)
+(in-package :prove.test)
 
 (defvar *default-test-function* #'equal)
 

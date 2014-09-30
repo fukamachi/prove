@@ -1,11 +1,11 @@
 (in-package :cl-user)
-(defpackage cl-test-more.color
+(defpackage prove.color
   (:use :cl)
   (:import-from :cl-ansi-text
                 :generate-color-string)
   (:export :*enable-colors*
            :with-color))
-(in-package :cl-test-more.color)
+(in-package :prove.color)
 
 (defvar *enable-colors*
   (not (equal (asdf::getenv "EMACS") "t"))

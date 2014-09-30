@@ -1,12 +1,12 @@
 (in-package :cl-user)
-(defpackage cl-test-more.reporter.list
+(defpackage prove.reporter.list
   (:use :cl
-        :cl-test-more.report
-        :cl-test-more.reporter)
-  (:import-from :cl-test-more.color
+        :prove.report
+        :prove.reporter)
+  (:import-from :prove.color
                 :with-color)
   (:export :list-reporter))
-(in-package :cl-test-more.reporter.list)
+(in-package :prove.reporter.list)
 
 (defclass list-reporter (reporter) ())
 

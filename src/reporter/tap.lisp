@@ -1,9 +1,9 @@
 (in-package :cl-user)
-(defpackage cl-test-more.reporter.tap
+(defpackage prove.reporter.tap
   (:use :cl
-        :cl-test-more.report
-        :cl-test-more.reporter))
-(in-package :cl-test-more.reporter.tap)
+        :prove.report
+        :prove.reporter))
+(in-package :prove.reporter.tap)
 
 (defclass tap-reporter (reporter) ())
 

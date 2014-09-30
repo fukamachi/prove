@@ -7,19 +7,19 @@
 
 (defclass fiveam-reporter (reporter) ())
 
-(defmethod format-report (stream (reporter fiveam-reporter) (report report) &rest args)
+(defmethod format-report (stream (reporter fiveam-reporter) (report comment-report) &rest args)
   (declare (ignore stream reporter report args))
   ;; Do nothing. This reporter doesn't support 'diag'.
   )
 
 (defmethod format-report (stream (reporter fiveam-reporter) (report test-report) &rest args)
   (declare (ignore args))
-  (write-char (if (failed-report-p report) #\f #\.) stream))
+  (when (zerop *indent-level*)
+    (write-char (if (failed-report-p report) #\f #\.) stream)))
 
-(defmethod print-error-report ((reporter fiveam-reporter) (report test-report) stream)
+(defmethod print-error-report ((reporter fiveam-reporter) (report failed-test-report) stream)
   (with-slots (description got got-form expected notp report-expected-label print-error-detail) report
     (cond
-      ((passed-report-p report))
       (print-error-detail
        (format/indent stream "~& ~:[(no description)~;~:*~A~]:~%    ~S~:[~*~; => ~S~]~%        is ~:[~;not ~]expected to ~:[be~;~:*~A~]~%    ~S~%"
                       description

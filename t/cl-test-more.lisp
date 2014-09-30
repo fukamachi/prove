@@ -4,7 +4,7 @@
         :cl-test-more))
 (in-package :t.cl-test-more)
 
-(setf *report-style* :list)
+(setf *report-style* :fiveam)
 
 (plan 10)
 

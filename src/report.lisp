@@ -15,6 +15,8 @@
            :failed-report-p
            :skipped-report-p
 
+           :plan
+           :children
            :description
            :notp
            :got

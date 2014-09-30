@@ -9,9 +9,9 @@
 
 (defclass list-reporter (reporter) ())
 
-(defmethod format-report (stream (reporter list-reporter) (report report) &rest args)
+(defmethod format-report (stream (reporter list-reporter) (report comment-report) &rest args)
   (declare (ignore args))
-  (format/indent stream "~&# ~A~2%"
+  (format/indent stream "~&  ~A~%"
                  (slot-value report 'description)))
 
 (defun possible-report-description (report)
@@ -83,32 +83,12 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report composed-test-report) &rest args)
   (declare (ignore args))
-  (flet ((print-duration-in-gray ()
-           (when (slot-value report 'duration)
-             (format stream " ")
-             (with-color (:gray :stream stream)
-               (format stream "(~Dms)" (slot-value report 'duration))))))
-    (format/indent stream "~&  ")
-    (if (failed-report-p report)
-        (with-color (:red :stream stream)
-          (format stream "×")
-          (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))
-          (print-duration-in-gray))
-        (progn
-          (with-color ((if (skipped-report-p report)
-                           :cyan
-                           :green) :stream stream)
-            (format stream "✓"))
-          (format stream " ~:[(no description)~;~:*~A~]" (slot-value report 'description))
-          (print-duration-in-gray))))
-  (terpri stream))
+  ;; Do nothing
+  )
 
 (defmethod print-plan-report ((reporter list-reporter) num stream)
-  (when num
-    (format-report stream
-                   reporter
-                   (make-instance 'report
-                                  :description (format nil "1..~A" num)))))
+  (when (numberp num)
+    (format/indent stream "~&1..~A~2%" num)))
 
 (defmethod print-finalize-report ((reporter list-reporter) plan reports stream)
   (let ((failed-count (count-if #'failed-report-p reports))

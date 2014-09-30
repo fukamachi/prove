@@ -238,6 +238,7 @@
         :print-error-detail nil))
 
 (defun %subtest (desc body-fn)
+  (diag desc)
   (let ((report
           (let ((*suite* (make-instance 'suite))
                 (*indent-level* (1+ *indent-level*)))

@@ -12,9 +12,10 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report comment-report) &rest args)
   (declare (ignore args))
-  (format/indent reporter
-                 stream "~&  ~A~%"
-                 (slot-value report 'description)))
+  (format/indent reporter stream "~& ")
+  (with-color (:white :stream stream)
+    (format stream (slot-value report 'description)))
+  (terpri stream))
 
 (defun report-expected-line (report)
   (when (and (typep report 'normal-test-report)

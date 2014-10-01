@@ -36,16 +36,25 @@
   #+quicklisp (ql:quickload system-designator)
   #-quicklisp (asdf:load-system system-designator)
   (let ((passed-files '()) (failed-files '()))
-    (dolist (c (reverse
-                (gethash (asdf:find-system system-designator) *system-test-files*)))
-      (setf *last-suite-report* nil)
-      (format *test-result-output* "~2&Running a test file '~A'~%" (asdf:component-pathname c))
-      (asdf:perform (make-instance 'asdf:load-source-op) c)
-      (unless *last-suite-report*
-        (warn "Test completed without 'finalize'd."))
-      (if (eql (getf *last-suite-report* :failed) 0)
-          (push (asdf:component-pathname c) passed-files)
-          (push (asdf:component-pathname c) failed-files)))
+    (restart-case
+        (dolist (c (reverse
+                    (gethash (asdf:find-system system-designator) *system-test-files*)))
+          (setf *last-suite-report* nil)
+          (format *test-result-output* "~2&Running a test file '~A'~%" (asdf:component-pathname c))
+          (restart-case
+              (progn
+                (asdf:perform (make-instance 'asdf:load-source-op) c)
+                (unless *last-suite-report*
+                  (warn "Test completed without 'finalize'd."))
+                (if (eql (getf *last-suite-report* :failed) 0)
+                    (push (asdf:component-pathname c) passed-files)
+                    (push (asdf:component-pathname c) failed-files)))
+            (skip-test-file ()
+              :report "Skip this test file."
+              (push (asdf:component-pathname c) failed-files))))
+      (skip-all-test-files ()
+        :report "Give up all test files."
+        nil))
     (values (null failed-files)
             (nreverse passed-files)
             (nreverse failed-files))))
@@ -90,18 +99,28 @@ Example:
         ((and (pathnamep object)
               (directory-pathname-p object))
          (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '()))
-           (dolist (file (test-files-in-directory object))
-             (multiple-value-bind (passedp passed-files failed-files)
-                 (run file)
-               (setf all-passed-files (append all-passed-files passed-files))
-               (setf all-failed-files (append all-failed-files failed-files))
-               (unless passedp
-                 (setf all-passed-p nil))))
+           (restart-case
+               (dolist (file (test-files-in-directory object))
+                 (multiple-value-bind (passedp passed-files failed-files)
+                     (run file)
+                   (setf all-passed-files (append all-passed-files passed-files))
+                   (setf all-failed-files (append all-failed-files failed-files))
+                   (unless passedp
+                     (setf all-passed-p nil))))
+             (skip-all-test-files ()
+               :report "Give up all test files."
+               nil))
            (values all-passed-p all-passed-files all-failed-files)))
         ((pathnamep object)
-         (load object)
-         (unless *last-suite-report*
-           (warn "Test completed without 'finalize'd."))
+         (setf *last-suite-report* nil)
+         (restart-case
+             (progn
+               (load object)
+               (unless *last-suite-report*
+                 (warn "Test completed without 'finalize'd.")))
+           (skip-test-file ()
+             :report "Skip this test file."
+             nil))
          (if (eql (getf *last-suite-report* :failed) 0)
              (values T (list object) '())
              (values NIL '() (list object))))

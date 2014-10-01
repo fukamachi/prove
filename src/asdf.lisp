@@ -33,9 +33,8 @@
 
 (defun run-test-system (system-designator)
   "Runs a testing ASDF system."
-  (unless (asdf:component-loaded-p system-designator)
-    #+quicklisp (ql:quickload system-designator)
-    #-quicklisp (asdf:load-system system-designator))
+  #+quicklisp (ql:quickload system-designator)
+  #-quicklisp (asdf:load-system system-designator)
   (let ((passed-files '()) (failed-files '()))
     (dolist (c (reverse
                 (gethash (asdf:find-system system-designator) *system-test-files*)))

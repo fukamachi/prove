@@ -33,7 +33,9 @@
 
 (defun run-test-system (system-designator)
   "Runs a testing ASDF system."
-  #+quicklisp (ql:quickload system-designator)
+  #+quicklisp (ql:quickload (if (typep system-designator 'asdf:system)
+                                (asdf:component-name system-designator)
+                                system-designator))
   #-quicklisp (asdf:load-system system-designator)
   (let ((passed-files '()) (failed-files '()))
     (restart-case

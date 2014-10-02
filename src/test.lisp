@@ -174,10 +174,10 @@
 (defmacro is-type (got expected-type &optional desc)
   (with-gensyms (duration result)
     `(with-duration ((,duration ,result) ,got)
-       (test (type-of ,result) ,expected-type ,desc
+       (test ,result ,expected-type ,desc
              :duration ,duration
              :got-form ',got
-             :test-fn #'subtypep
+             :test-fn #'typep
              :report-expected-label "be a type of"))))
 
 (defmacro like (got regex &optional desc)

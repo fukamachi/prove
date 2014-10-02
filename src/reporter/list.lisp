@@ -18,11 +18,10 @@
   (terpri stream))
 
 (defun report-expected-line (report)
-  (when (and (typep report 'normal-test-report)
-             (slot-value report 'got-form))
+  (when (typep report 'normal-test-report)
     (with-slots (got got-form notp report-expected-label expected) report
       (format nil "~S is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~S~:[ (got ~S)~;~*~]"
-              got-form
+              (or got-form got)
               notp
               report-expected-label
               expected

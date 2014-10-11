@@ -1,5 +1,6 @@
 (in-package :cl-user)
 (defpackage prove.asdf
+  (:nicknames :prove-asdf)
   (:use :cl
         :asdf)
   (:import-from :prove.output

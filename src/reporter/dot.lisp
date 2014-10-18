@@ -30,3 +30,13 @@
 (defmethod print-finalize-report :before ((reporter dot-reporter) plan reports stream)
   (declare (ignore plan reports))
   (fresh-line stream))
+
+(defmethod print-finalize-report :after ((reporter dot-reporter) plan reports stream)
+  (let ((failed-reports (remove-if-not #'failed-report-p reports))
+        (list-reporter (make-instance 'list-reporter)))
+    (when failed-reports
+      (format stream "~2&")
+      (map nil
+           (lambda (report)
+             (format-report stream list-reporter report))
+           failed-reports))))

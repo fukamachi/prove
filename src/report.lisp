@@ -6,6 +6,7 @@
            :normal-test-report
            :passed-test-report
            :failed-test-report
+           :error-test-report
            :skipped-test-report
            :comment-report
            :composed-test-report
@@ -13,6 +14,7 @@
            :test-report-p
            :passed-report-p
            :failed-report-p
+           :error-report-p
            :skipped-report-p
 
            :plan
@@ -36,7 +38,8 @@
 (defclass comment-report (report) ())
 
 (defclass test-report (report)
-  ((duration :initarg :duration)
+  ((duration :initarg :duration
+             :initform nil)
    (slow-threshold :initarg :slow-threshold)
    (print-error-detail :type boolean
                        :initarg :print-error-detail
@@ -44,8 +47,7 @@
 
 (defclass normal-test-report (test-report)
   ((test-function :type (or function symbol)
-                  :initarg :test-function
-                  :initform (error ":test-function is required"))
+                  :initarg :test-function)
    (notp :type boolean
          :initarg :notp
          :initform nil)
@@ -67,6 +69,7 @@
 
 (defclass passed-test-report (normal-test-report) ())
 (defclass failed-test-report (normal-test-report) ())
+(defclass error-test-report (failed-test-report) ())
 (defclass skipped-test-report (normal-test-report) ())
 
 (defun test-report-p (report)
@@ -87,6 +90,9 @@
     (composed-test-report
      (some #'failed-report-p (slot-value report 'children)))
     (otherwise nil)))
+
+(defun error-report-p (report)
+  (typep report 'error-test-report))
 
 (defun skipped-report-p (report)
   (typecase report

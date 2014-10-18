@@ -22,7 +22,9 @@
                        ((failed-report-p report) :red)
                        ((skipped-report-p report) :cyan)
                        (T :gray)) :stream stream)
-          (format stream "."))
+          (format stream (if (error-report-p report)
+                             "x"
+                             ".")))
         (write-char (if (failed-report-p report) #\f #\.) stream))))
 
 (defmethod print-finalize-report :before ((reporter dot-reporter) plan reports stream)

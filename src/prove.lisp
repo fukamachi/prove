@@ -10,6 +10,7 @@
                 :run-test-system
                 :run)
   (:import-from :prove.test
+                :*debug-on-error*
                 :*default-test-function*
                 :ok
                 :is
@@ -44,7 +45,8 @@
                 :package-suite)
   (:import-from :prove.color
                 :*enable-colors*)
-  (:export :*test-result-output*
+  (:export :*debug-on-error*
+           :*test-result-output*
            :*default-test-function*
            :*default-reporter*
            :test-file

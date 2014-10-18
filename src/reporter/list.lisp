@@ -91,6 +91,19 @@
       (format stream (report-expected-line report))))
   (terpri stream))
 
+(defmethod format-report (stream (reporter list-reporter) (report error-test-report) &rest args)
+  (declare (ignore args))
+  (format/indent reporter stream "~&  ")
+  (with-color (:red :stream stream)
+    (format stream "× ")
+    (when (slot-value report 'description)
+      (format stream "~A~%" (slot-value report 'description))
+      (format/indent reporter stream "    "))
+    (format stream "Raised an error ~S (expected: ~S)"
+            (slot-value report 'got)
+            (slot-value report 'expected)))
+  (terpri stream))
+
 (defmethod format-report (stream (reporter list-reporter) (report composed-test-report) &rest args)
   (declare (ignore args))
   ;; Do nothing

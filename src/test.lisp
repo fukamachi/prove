@@ -7,6 +7,7 @@
                 :test-report-p
                 :passed-test-report
                 :failed-test-report
+                :error-test-report
                 :skipped-test-report
                 :comment-report
                 :composed-test-report
@@ -27,8 +28,10 @@
                 :finalize
                 :add-report)
   (:import-from :alexandria
-                :with-gensyms)
+                :with-gensyms
+                :once-only)
   (:export :*default-test-function*
+           :*debug-on-error*
 
            :ok
            :is
@@ -55,6 +58,7 @@
            :remove-test-all))
 (in-package :prove.test)
 
+(defvar *debug-on-error* nil)
 (defvar *default-test-function* #'equal)
 
 (defun parse-description-and-test (args)
@@ -120,42 +124,72 @@
             (,duration (- ,end ,start)))
        ,@body)))
 
+(defmacro with-catching-errors ((&key description expected) &body body)
+  (with-gensyms (e suite report)
+    `(if *debug-on-error*
+         (progn ,@body)
+         (handler-case (progn ,@body)
+           (error (,e)
+             (let ((,suite (current-suite))
+                   (,report (make-instance 'error-test-report
+                                           :got ,e
+                                           :got-form ,e
+                                           :expected ,expected
+                                           :description ,description
+                                           :duration nil)))
+               (add-report ,report ,suite)
+               (incf (failed ,suite))
+               (incf (test-count ,suite))
+               (format-report (test-result-output) nil ,report :count (test-count ,suite))))))))
+
 (defmacro ok (test &optional desc)
   (with-gensyms (duration result)
-    `(with-duration ((,duration ,result) ,test)
-       (test ,result t ,desc
-             :duration ,duration
-             :test-fn (lambda (x y)
-                        (eq (not (null x)) y))))))
+    (once-only (desc)
+      `(with-catching-errors (:expected T :description ,desc)
+         (with-duration ((,duration ,result) ,test)
+           (test ,result t ,desc
+                 :duration ,duration
+                 :test-fn (lambda (x y)
+                            (eq (not (null x)) y))))))))
 
 (defmacro is (got expected &rest args)
-  (with-gensyms (duration result)
-    `(with-duration ((,duration ,result) ,got)
-       (test ,result ,expected (list ,@args)
-             :duration ,duration))))
+  (with-gensyms (duration result new-args desc)
+    (once-only (expected)
+      `(let* ((,new-args (list ,@args))
+              (,desc (parse-description-and-test ,new-args)))
+         (with-catching-errors (:description ,desc :expected ,expected)
+           (with-duration ((,duration ,result) ,got)
+             (test ,result ,expected ,new-args
+                   :duration ,duration)))))))
 
 (defmacro isnt (got expected &rest args)
-  (with-gensyms (duration result)
-    `(with-duration ((,duration ,result) ,got)
-       (test ,result ,expected (list ,@args)
-             :notp t
-             :duration ,duration))))
+  (with-gensyms (duration result new-args desc)
+    (once-only (expected)
+      `(let* ((,new-args (list ,@args))
+              (,desc (parse-description-and-test ,new-args)))
+         (with-catching-errors (:description ,desc :expected ,expected)
+           (with-duration ((,duration ,result) ,got)
+             (test ,result ,expected ,new-args
+                   :notp t
+                   :duration ,duration)))))))
 
 (defmacro is-values (got expected &rest args)
   `(is (multiple-value-list ,got) ,expected ,@args))
 
 (defmacro is-print (got expected &optional desc)
   (with-gensyms (output duration duration-inner)
-    `(let* (,duration
-            (,output (with-output-to-string (*standard-output*)
-                       (with-duration ((,duration-inner ,output) ,got)
-                         (declare (ignore ,output))
-                         (setq ,duration ,duration-inner)))))
-       (test ,output ,expected ,desc
-             :duration ,duration
-             :got-form ',got
-             :test-fn #'string=
-             :report-expected-label "output"))))
+    (once-only (expected desc)
+      `(with-catching-errors (:description ,desc :expected ,expected)
+         (let* (,duration
+                (,output (with-output-to-string (*standard-output*)
+                           (with-duration ((,duration-inner ,output) ,got)
+                             (declare (ignore ,output))
+                             (setq ,duration ,duration-inner)))))
+           (test ,output ,expected ,desc
+                 :duration ,duration
+                 :got-form ',got
+                 :test-fn #'string=
+                 :report-expected-label "output"))))))
 
 (defmacro is-error (form condition &optional desc)
   (with-gensyms (error duration)
@@ -173,20 +207,24 @@
 
 (defmacro is-type (got expected-type &optional desc)
   (with-gensyms (duration result)
-    `(with-duration ((,duration ,result) ,got)
-       (test ,result ,expected-type ,desc
-             :duration ,duration
-             :got-form ',got
-             :test-fn #'typep
-             :report-expected-label "be a type of"))))
+    (once-only (desc expected-type)
+      `(with-catching-errors (:description ,desc :expected ,expected-type)
+         (with-duration ((,duration ,result) ,got)
+           (test ,result ,expected-type ,desc
+                 :duration ,duration
+                 :got-form ',got
+                 :test-fn #'typep
+                 :report-expected-label "be a type of"))))))
 
 (defmacro like (got regex &optional desc)
   (with-gensyms (duration result)
-    `(with-duration ((,duration ,result) ,got)
-       (test ,result ,regex ,desc
-             :duration ,duration
-             :test-fn (lambda (x y) (not (null (ppcre:scan y x))))
-             :report-expected-label "be like"))))
+    (once-only (regex desc)
+      `(with-catching-errors (:description ,desc :expected ,regex)
+         (with-duration ((,duration ,result) ,got)
+           (test ,result ,regex ,desc
+                 :duration ,duration
+                 :test-fn (lambda (x y) (not (null (ppcre:scan y x))))
+                 :report-expected-label "be like"))))))
 
 (defvar *gensym-prefix* "$")
 (defvar *gensym-alist* nil)
@@ -210,13 +248,15 @@
 
 (defmacro is-expand (got expected &optional desc)
   (with-gensyms (duration expanded)
-    `(with-duration ((,duration ,expanded) (macroexpand-1 ',got))
-       (let (*gensym-alist*)
-         (test ,expanded ',expected ,desc
-               :duration ,duration
-               :got-form ',got
-               :report-expected-label "be expanded to"
-               :test-fn #'gensym-tree-equal)))))
+    (once-only (expected desc)
+      `(with-catching-errors (:description ,desc :expected ,expected)
+         (with-duration ((,duration ,expanded) (macroexpand-1 ',got))
+           (let (*gensym-alist*)
+             (test ,expanded ',expected ,desc
+                   :duration ,duration
+                   :got-form ',got
+                   :report-expected-label "be expanded to"
+                   :test-fn #'gensym-tree-equal)))))))
 
 (defun diag (desc)
   (let ((report (make-instance 'comment-report

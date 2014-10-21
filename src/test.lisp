@@ -248,15 +248,14 @@
 
 (defmacro is-expand (got expected &optional desc)
   (with-gensyms (duration expanded)
-    (once-only (expected desc)
-      `(with-catching-errors (:description ,desc :expected ,expected)
-         (with-duration ((,duration ,expanded) (macroexpand-1 ',got))
-           (let (*gensym-alist*)
-             (test ,expanded ',expected ,desc
-                   :duration ,duration
-                   :got-form ',got
-                   :report-expected-label "be expanded to"
-                   :test-fn #'gensym-tree-equal)))))))
+    (once-only (desc)
+      `(with-duration ((,duration ,expanded) (macroexpand-1 ',got))
+         (let (*gensym-alist*)
+           (test ,expanded ',expected ,desc
+                 :duration ,duration
+                 :got-form ',got
+                 :report-expected-label "be expanded to"
+                 :test-fn #'gensym-tree-equal))))))
 
 (defun diag (desc)
   (let ((report (make-instance 'comment-report

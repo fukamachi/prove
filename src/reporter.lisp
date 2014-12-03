@@ -39,8 +39,8 @@
 
 (defun find-reporter (name)
   (make-instance
-   (intern (format nil "~A-~A" name #.(string :reporter))
-           (intern (format nil "~A.~A"
+   (intern (format nil "~:@(~A~)-~A" name #.(string :reporter))
+           (intern (format nil "~A.~:@(~A~)"
                            #.(string :prove.reporter)
                            name)
                    :keyword))))

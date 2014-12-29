@@ -4,7 +4,8 @@
   (:import-from :prove.output
                 :test-result-output)
   (:import-from :prove.report
-                :report)
+                :report
+                :failed-report-p)
   (:import-from :prove.reporter
                 :print-plan-report
                 :print-finalize-report)
@@ -73,6 +74,8 @@
 
 (defun add-report (report suite)
   (check-type report report)
+  (when (failed-report-p report)
+    (incf (slot-value suite 'failed)))
   (vector-push-extend report (slot-value suite 'reports)))
 
 (defun plan (num)

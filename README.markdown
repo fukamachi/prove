@@ -279,6 +279,10 @@ The `:tap` reporter outputs in [Test Anything Protocol](http://testanything.org)
 
 ## Tips
 
+### Debugging with CL debugger
+
+Set `prove:*debug-on-error*` T for invoking CL debugger whenever getting an error during running tests.
+
 ### Colorize test reports on SLIME
 
 SLIME doesn't support to color with ANSI colors in the REPL buffer officially.

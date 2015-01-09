@@ -340,13 +340,17 @@ Test functions like `is` uses `prove:*default-test-function*` for testing if no 
 
 Test reports will be output to `prove:*test-result-output*`. The default value is `T`, which means `*standard-output*`.
 
-## Projects using 'prove' (or CL-TEST-MORE, the old name of 'prove')
+### Running tests on Travis CI
 
-* [Clack](https://github.com/fukamachi/clack)
-* [CL-DBI](https://github.com/fukamachi/cl-dbi)
-* [datafly](https://github.com/fukamachi/datafly)
-* [cl-base58](https://github.com/eudoxia0/cl-base58)
-* [Green-Threads](https://github.com/thezerobit/green-threads)
+Although Common Lisp isn't supported by Travis CI officially, you can run tests by using [cl-travis](https://github.com/luismbo/cl-travis).
+
+Here's a list of `.travis.yml` from projects using `prove` on Travis CI:
+
+- [Clack](https://github.com/fukamachi/clack/blob/master/.travis.yml)
+- [CL-DBI](https://github.com/fukamachi/cl-dbi/blob/master/.travis.yml)
+- [Woo](https://github.com/fukamachi/Woo/blob/master/.travis.yml)
+- [fast-http](https://github.com/fukamachi/fast-http/blob/master/.travis.yml)
+- [defclass-std](https://github.com/EuAndreh/defclass-std/blob/master/.travis.yml)
 
 ## Bugs
 

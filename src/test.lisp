@@ -281,7 +281,17 @@
   (let ((report
           (let ((*suite* (make-instance 'suite))
                 (*indent-level* (1+ *indent-level*)))
-            (funcall body-fn)
+            (if *debug-on-error*
+                (funcall body-fn)
+                (handler-case (funcall body-fn)
+                  (error (e)
+                    (let ((error-report
+                            (make-instance 'error-test-report
+                                           :expected :non-error
+                                           :got e
+                                           :description (format nil "Aborted due to an error in subtest ~S" desc))))
+                      (add-report error-report *suite*)
+                      (format-report (test-result-output) nil error-report :count (test-count *suite*))))))
             (make-instance 'composed-test-report
                            :duration (reduce #'+
                                              (remove-if-not #'test-report-p (reports *suite*))

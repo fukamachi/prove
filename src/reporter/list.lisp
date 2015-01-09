@@ -17,14 +17,26 @@
     (format stream (slot-value report 'description)))
   (terpri stream))
 
+(defun omit-long-value (value)
+  (typecase value
+    (string
+     (if (< 100 (length value))
+         (format nil "\"~A ...\"" (subseq value 0 94))
+         (prin1-to-string value)))
+    (otherwise
+     (let ((value (prin1-to-string value)))
+       (if (< 100 (length value))
+           (format nil "~A ..." (subseq value 0 96))
+           value)))))
+
 (defun report-expected-line (report)
   (when (typep report 'normal-test-report)
     (with-slots (got got-form notp report-expected-label expected) report
-      (format nil "~S is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~S~:[ (got ~S)~;~*~]"
-              (or got-form got)
+      (format nil "~A is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~A~:[ (got ~S)~;~*~]"
+              (omit-long-value (or got-form got))
               notp
               report-expected-label
-              expected
+              (omit-long-value expected)
               (eq got got-form)
               got))))
 

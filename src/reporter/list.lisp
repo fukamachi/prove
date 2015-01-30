@@ -20,12 +20,12 @@
 (defun omit-long-value (value)
   (typecase value
     (string
-     (if (< 100 (length value))
+     (if (< 500 (length value))
          (format nil "\"~A ...\"" (subseq value 0 94))
          (prin1-to-string value)))
     (otherwise
      (let ((value (prin1-to-string value)))
-       (if (< 100 (length value))
+       (if (< 500 (length value))
            (format nil "~A ..." (subseq value 0 96))
            value)))))
 

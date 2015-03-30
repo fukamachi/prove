@@ -243,8 +243,10 @@
               t))
         (equal x y)))
   (:method ((x cons) (y cons))
-    (loop for a in x for b in y
-          always (gensym-tree-equal a b))))
+    (if (consp (cdr x))
+        (loop for a in x for b in y
+           always (gensym-tree-equal a b))
+        (equal x y))))
 
 (defmacro is-expand (got expected &optional desc)
   (with-gensyms (duration expanded)

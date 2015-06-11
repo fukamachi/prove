@@ -1,0 +1,22 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+
+(unless (find-package :uiop)
+  (ql:quickload :uiop :silent t))
+
+(ql:quickload :prove :silent t)
+
+(defun main (&rest test-files)
+  (when (some #'null
+              (mapcar (lambda (test-file)
+                        (let ((test-file (pathname test-file)))
+                          (unless (or (probe-file test-file)
+                                      (string= (pathname-type test-file) "asd"))
+                            (error "~S is not an asd file." test-file))
+                          (load test-file)
+                          (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
+                      test-files))
+    (uiop:quit -1)))

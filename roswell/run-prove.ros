@@ -25,9 +25,11 @@ exec ros -Q -- $0 "$@"
                                 (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
                             test-files)))))
     (or #.(if (uiop:getenv "COVERALLS")
-              '(coveralls:with-coveralls (:exclude
-                                          (split-sequence:split-sequence #\: (or (uiop:getenv "COVERAGE_EXCLUDE") "")
-                                                                         :remove-empty-subseqs t))
+              `(,(intern (string :with-coveralls) :coveralls)
+                (:exclude
+                 (,(intern (string :split-sequence) :split-sequence)
+                  #\: (or (uiop:getenv "COVERAGE_EXCLUDE") "")
+                  :remove-empty-subseqs t))
                  (run-tests))
               '(run-tests))
         (uiop:quit -1))))

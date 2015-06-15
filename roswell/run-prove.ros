@@ -9,14 +9,25 @@ exec ros -Q -- $0 "$@"
 
 (ql:quickload :prove :silent t)
 
+(when (uiop:getenv "COVERALLS")
+  (ql:quickload '(:cl-coveralls :split-sequence) :silent t))
+
 (defun main (&rest test-files)
-  (when (some #'null
-              (mapcar (lambda (test-file)
-                        (let ((test-file (pathname test-file)))
-                          (unless (or (probe-file test-file)
-                                      (string= (pathname-type test-file) "asd"))
-                            (error "~S is not an asd file." test-file))
-                          (load test-file)
-                          (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
-                      test-files))
-    (uiop:quit -1)))
+  (labels ((run-tests ()
+             (not
+              (some #'null
+                    (mapcar (lambda (test-file)
+                              (let ((test-file (pathname test-file)))
+                                (unless (or (probe-file test-file)
+                                            (string= (pathname-type test-file) "asd"))
+                                  (error "~S is not an asd file." test-file))
+                                (load test-file)
+                                (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
+                            test-files)))))
+    (or #.(if (uiop:getenv "COVERALLS")
+              '(coveralls:with-coveralls (:exclude
+                                          (split-sequence:split-sequence #\: (or (uiop:getenv "COVERAGE_EXCLUDE") "")
+                                                                         :remove-empty-subseqs t))
+                 (run-tests))
+              '(run-tests))
+        (uiop:quit -1))))

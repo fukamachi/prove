@@ -111,7 +111,7 @@
     (when (slot-value report 'description)
       (format stream "~A~%" (slot-value report 'description))
       (format/indent reporter stream "    "))
-    (format stream "Raised an error ~S (expected: ~S)"
+    (format stream "Raised an error ~A (expected: ~S)"
             (slot-value report 'got)
             (slot-value report 'expected)))
   (terpri stream))

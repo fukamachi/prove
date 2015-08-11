@@ -14,7 +14,7 @@
   (declare (ignore args))
   (format/indent reporter stream "~& ")
   (with-color (:white :stream stream)
-    (format stream (slot-value report 'description)))
+    (princ (slot-value report 'description) stream))
   (terpri stream))
 
 (defun omit-long-value (value)
@@ -100,7 +100,7 @@
         (print-duration stream duration (slot-value report 'slow-threshold))))
     (when (slot-value report 'description)
       (format/indent reporter stream "~&    ")
-      (format stream (report-expected-line report))))
+      (princ (report-expected-line report) stream)))
   (terpri stream))
 
 (defmethod format-report (stream (reporter list-reporter) (report error-test-report) &rest args)

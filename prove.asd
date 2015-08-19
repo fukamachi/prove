@@ -8,7 +8,7 @@
   :author "Eitaro Fukamachi"
   :license "MIT"
   :depends-on (:cl-ppcre
-               #-abcl :cl-ansi-text
+               :cl-ansi-text
                :alexandria)
   :components ((:module "src"
                 :components

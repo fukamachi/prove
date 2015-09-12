@@ -17,6 +17,7 @@
                 :isnt
                 :is-values
                 :is-print
+                :is-condition
                 :is-error
                 :is-type
                 :like
@@ -57,6 +58,7 @@
            :isnt
            :is-values
            :is-print
+           :is-condition
            :is-error
            :is-type
            :like

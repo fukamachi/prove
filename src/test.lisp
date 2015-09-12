@@ -38,6 +38,7 @@
            :isnt
            :is-values
            :is-print
+           :is-condition
            :is-error
            :is-type
            :like
@@ -150,7 +151,8 @@
            (test ,result t ,desc
                  :duration ,duration
                  :test-fn (lambda (x y)
-                            (eq (not (null x)) y))))))))
+                            (eq (not (null x)) y))
+                 :got-form ,test))))))
 
 (defmacro is (got expected &rest args)
   (with-gensyms (duration result new-args desc)
@@ -191,7 +193,7 @@
                  :test-fn #'string=
                  :report-expected-label "output"))))))
 
-(defmacro is-error (form condition &optional desc)
+(defmacro is-condition (form condition &optional desc)
   (with-gensyms (error duration)
     `(with-duration ((,duration ,error) (handler-case ,form
                                           (condition (,error) ,error)))
@@ -204,6 +206,9 @@
              :got-form ',form
              :test-fn #'typep
              :report-expected-label "raise a condition"))))
+
+;;; alias is-error to is-condition
+(setf (macro-function 'is-error) (macro-function 'is-condition))
 
 (defmacro is-type (got expected-type &optional desc)
   (with-gensyms (duration result)

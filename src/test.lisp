@@ -151,8 +151,7 @@
            (test ,result t ,desc
                  :duration ,duration
                  :test-fn (lambda (x y)
-                            (eq (not (null x)) y))
-                 :got-form ,test))))))
+                            (eq (not (null x)) y))))))))
 
 (defmacro is (got expected &rest args)
   (with-gensyms (duration result new-args desc)

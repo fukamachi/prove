@@ -34,6 +34,7 @@
 
 (defun run-test-system (system-designator)
   "Runs a testing ASDF system."
+  (setf (gethash (asdf:find-system system-designator) *system-test-files*) '())
   #+quicklisp (ql:quickload (if (typep system-designator 'asdf:system)
                                 (asdf:component-name system-designator)
                                 system-designator))

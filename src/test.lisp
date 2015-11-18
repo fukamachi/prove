@@ -145,7 +145,7 @@
 
 (defmacro ok (test &optional desc)
   (with-gensyms (duration result)
-    (once-only (desc)
+    (once-only (test desc)
       `(with-catching-errors (:expected T :description ,desc)
          (with-duration ((,duration ,result) ,test)
            (test ,result t ,desc

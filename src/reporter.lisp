@@ -5,9 +5,11 @@
                 :report
                 :test-report
                 :description)
-  (:import-from :prove.output
-                :*default-reporter*)
+  (:import-from :prove.reporter-common
+                :*default-reporter*
+                :print-failed-reports)
   (:export :*indent-level*
+           :*default-reporter*
            :indent-space
            :format/indent
 
@@ -15,7 +17,8 @@
            :format-report
            :print-error-report
            :print-plan-report
-           :print-finalize-report))
+           :print-finalize-report
+           :print-failed-reports))
 (in-package :prove.reporter)
 
 (defparameter *indent-level* 0)
@@ -78,3 +81,17 @@
                            plan
                            reports
                            stream)))
+
+(defmethod print-failed-reports ((reporter null) failed-reports stream)
+  (print-failed-reports (find-reporter *default-reporter*)
+                        failed-reports
+                        stream))
+(defmethod print-failed-reports ((reporter reporter) failed-reports stream)
+  (declare (list failed-reports))
+  (format/indent reporter stream "~2&Failed Tests:~%")
+  (loop for (path . reports) in failed-reports do
+       (progn
+         (format/indent reporter stream "~a:" path)
+         (let ((*indent-level* (1+ *indent-level*)))
+           (dolist (report reports)
+             (format-report stream reporter report))))))

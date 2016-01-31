@@ -21,6 +21,7 @@
            :test-count
            :failed
            :reports
+           :failed-reports
            :slow-threshold
            :*default-slow-threshold*
 
@@ -88,5 +89,12 @@
   (with-slots (plan reports failed) suite
     (print-finalize-report nil plan reports (test-result-output))
     (setf *last-suite-report*
-          (list :plan plan :failed failed))
+          (list :plan plan :failed failed :failed-tests (failed-reports suite)))
     (zerop failed)))
+
+(defun failed-reports (&optional (suite (current-suite)))
+  (let ((reports (reports suite)))
+    (loop
+       for report across reports
+       if (failed-report-p report)
+       collect report)))

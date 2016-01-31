@@ -4,8 +4,10 @@
   (:use :cl
         :asdf)
   (:import-from :prove.output
-                :*test-result-output*
-                :*default-reporter*)
+                :*test-result-output*)
+  (:import-from :prove.reporter-common
+                :*default-reporter*
+                :print-failed-reports)
   (:export :test-file
            :run-test-system
            :run
@@ -39,7 +41,7 @@
                                 (asdf:component-name system-designator)
                                 system-designator))
   #-quicklisp (asdf:load-system system-designator)
-  (let ((passed-files '()) (failed-files '()))
+  (let ((passed-files '()) (failed-files '()) (failed-tests '()))
     (restart-case
         (dolist (c (reverse
                     (gethash (asdf:find-system system-designator) *system-test-files*)))
@@ -52,13 +54,18 @@
                   (warn "Test completed without 'finalize'd."))
                 (if (eql (getf *last-suite-report* :failed) 0)
                     (push (asdf:component-pathname c) passed-files)
-                    (push (asdf:component-pathname c) failed-files)))
+                    (let ((pathname (asdf:component-pathname c)))
+                      (push pathname failed-files)
+                      (push (cons pathname (getf *last-suite-report* :failed-tests))
+                            failed-tests))))
             (skip-test-file ()
               :report "Skip this test file."
               (push (asdf:component-pathname c) failed-files))))
       (skip-all-test-files ()
         :report "Give up all test files."
         nil))
+    (when failed-tests
+      (print-failed-reports nil (nreverse failed-tests) *test-result-output*))
     (values (null failed-files)
             (nreverse passed-files)
             (nreverse failed-files))))
@@ -102,7 +109,8 @@ Example:
          (run (pathname object)))
         ((and (pathnamep object)
               (directory-pathname-p object))
-         (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '()))
+         (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '())
+               (failed-tests '()))
            (restart-case
                (dolist (file (test-files-in-directory object))
                  (multiple-value-bind (passedp passed-files failed-files)
@@ -110,10 +118,14 @@ Example:
                    (setf all-passed-files (append all-passed-files passed-files))
                    (setf all-failed-files (append all-failed-files failed-files))
                    (unless passedp
-                     (setf all-passed-p nil))))
+                     (setf all-passed-p nil)
+                     (push (cons file (getf *last-suite-report* :failed-tests))
+                           failed-tests))))
              (skip-all-test-files ()
                :report "Give up all test files."
                nil))
+           (when failed-tests
+             (print-failed-reports nil (nreverse failed-tests) *test-result-output*))
            (values all-passed-p all-passed-files all-failed-files)))
         ((pathnamep object)
          (setf *last-suite-report* nil)

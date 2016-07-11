@@ -297,6 +297,13 @@ After installing it, set `prove:*enable-colors*` to `T` before running tests.
 (setf prove:*enable-colors* t)
 ```
 
+The following snippet is a little bit complicated, however it would be better if you don't like to load `prove` in all sessions.
+
+```common-lisp
+(defmethod asdf:perform :after ((op asdf:load-op) (c (eql (asdf:find-system :prove))))
+  (setf (symbol-value (intern (string :*enable-colors*) :prove)) t))
+```
+
 ### ASDF integration
 
 Add `:defsystem-depends-on (:prove-asdf)` to your testing ASDF system to enable `:test-file` in the `:components`.

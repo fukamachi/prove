@@ -3,7 +3,8 @@
   (:nicknames :cl-test-more :test-more)
   (:use :cl)
   (:import-from :prove.output
-                :*test-result-output*
+                :*test-result-output*)
+  (:import-from :prove.reporter-common
                 :*default-reporter*)
   (:import-from :prove.asdf
                 :test-file

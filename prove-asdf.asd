@@ -6,5 +6,6 @@
 (defsystem prove-asdf
   :components ((:module "src"
                 :components
-                ((:file "asdf" :depends-on ("output"))
-                 (:file "output")))))
+                ((:file "asdf" :depends-on ("output" "reporter-common"))
+                 (:file "output")
+                 (:file "reporter-common")))))

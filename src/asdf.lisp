@@ -59,9 +59,21 @@
       (skip-all-test-files ()
         :report "Give up all test files."
         nil))
+    (setf passed-files (nreverse passed-files)
+          failed-files (nreverse failed-files))
+    (format t "~2&Summary:~%")
+    (if failed-files
+        (prove.color:with-color (:red :stream t)
+          (format t "  ~D file~:*~P failed.~{~%    - ~A~}
+"
+                  (length failed-files)
+                  failed-files))
+        (prove.color:with-color (:green :stream t)
+          (format t "  All ~D file~:*~P passed.~%"
+                  (length passed-files))))
     (values (null failed-files)
-            (nreverse passed-files)
-            (nreverse failed-files))))
+            passed-files
+            failed-files)))
 
 (defun test-files-in-directory (directory)
   (check-type directory pathname)

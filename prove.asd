@@ -25,6 +25,6 @@
                    (:file "list")
                    (:file "dot" :depends-on ("list"))))
                  (:file "suite" :depends-on ("output" "report" "reporter" "asdf"))
-                 (:file "asdf" :depends-on ("output"))
+                 (:file "asdf" :depends-on ("output" "color"))
                  (:file "color")
                  (:file "output")))))

@@ -13,23 +13,31 @@ exec ros -Q -- $0 "$@"
   (ql:quickload '(:cl-coveralls :split-sequence) :silent t))
 
 (defun main (&rest test-files)
-  (labels ((run-tests ()
-             (not
-              (some #'null
-                    (mapcar (lambda (test-file)
-                              (let ((test-file (pathname test-file)))
-                                (unless (or (probe-file test-file)
-                                            (string= (pathname-type test-file) "asd"))
-                                  (error "~S is not an asd file." test-file))
-                                (load test-file)
-                                (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
-                            test-files)))))
-    (or #.(if (uiop:getenv "COVERALLS")
-              `(,(intern (string :with-coveralls) :coveralls)
-                (:exclude
-                 (,(intern (string :split-sequence) :split-sequence)
-                  #\: (or (uiop:getenv "COVERAGE_EXCLUDE") "")
-                  :remove-empty-subseqs t))
-                 (run-tests))
-              '(run-tests))
-        (uiop:quit -1))))
+  (let (reporter)
+    (when (or (string= (first test-files) "-r")
+              (string= (first test-files) "--reporter"))
+      (setf reporter (second test-files)
+            test-files (cddr test-files)))
+    (labels ((run-tests ()
+               (not
+                (some #'null
+                      (mapcar (lambda (test-file)
+                                (let ((test-file (pathname test-file))
+                                      (prove.output:*default-reporter*
+                                        (or reporter
+                                            prove.output:*default-reporter*)))
+                                  (unless (or (probe-file test-file)
+                                              (string= (pathname-type test-file) "asd"))
+                                    (error "~S is not an asd file." test-file))
+                                  (load test-file)
+                                  (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
+                              test-files)))))
+      (or #.(if (uiop:getenv "COVERALLS")
+                `(,(intern (string :with-coveralls) :coveralls)
+                  (:exclude
+                   (,(intern (string :split-sequence) :split-sequence)
+                    #\: (or (uiop:getenv "COVERAGE_EXCLUDE") "")
+                    :remove-empty-subseqs t))
+                  (run-tests))
+                '(run-tests))
+          (uiop:quit -1)))))

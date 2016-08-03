@@ -2,7 +2,7 @@
 (defpackage prove.suite
   (:use :cl)
   (:import-from :prove.output
-                :test-result-output)
+                :*test-result-output*)
   (:import-from :prove.report
                 :report
                 :failed-report-p)
@@ -82,11 +82,11 @@
   (let ((suite (current-suite)))
     (setf (slot-value suite 'plan) num)
     (reset-suite suite))
-  (print-plan-report nil num (test-result-output)))
+  (print-plan-report nil num *test-result-output*))
 
 (defun finalize (&optional (suite (current-suite)))
   (with-slots (plan reports failed) suite
-    (print-finalize-report nil plan reports (test-result-output))
+    (print-finalize-report nil plan reports *test-result-output*)
     (setf *last-suite-report*
           (list :plan plan :failed failed))
     (zerop failed)))

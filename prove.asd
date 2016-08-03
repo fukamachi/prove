@@ -9,7 +9,8 @@
   :license "MIT"
   :depends-on (:cl-ppcre
                :cl-ansi-text
-               :alexandria)
+               :alexandria
+               #:uiop)
   :components ((:module "src"
                 :components
                 ((:file "prove" :depends-on ("output" "test" "suite" "asdf" "color"))

@@ -9,6 +9,7 @@
   :license "MIT"
   :depends-on (:cl-ppcre
                :cl-ansi-text
+               :cl-colors
                :alexandria)
   :components ((:module "src"
                 :components

@@ -3,6 +3,9 @@
   (:use :cl)
   (:import-from :cl-ansi-text
                 :generate-color-string)
+  (:import-from :cl-colors
+                :+gray+
+                :+grey+)
   (:export :*enable-colors*
            :with-color))
 (in-package :prove.color)

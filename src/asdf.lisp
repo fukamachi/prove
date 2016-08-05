@@ -63,14 +63,12 @@
           failed-files (nreverse failed-files))
     (format t "~2&Summary:~%")
     (if failed-files
-        (prove.color:with-color (:red :stream t)
-          (format t "  ~D file~:*~P failed.~{~%    - ~A~}
+        (format t "  ~D file~:*~P failed.~{~%    - ~A~}
 "
-                  (length failed-files)
-                  failed-files))
-        (prove.color:with-color (:green :stream t)
-          (format t "  All ~D file~:*~P passed.~%"
-                  (length passed-files))))
+                (length failed-files)
+                failed-files)
+        (format t "  All ~D file~:*~P passed.~%"
+                (length passed-files)))
     (values (null failed-files)
             passed-files
             failed-files)))

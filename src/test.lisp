@@ -2,7 +2,7 @@
 (defpackage prove.test
   (:use :cl)
   (:import-from :prove.output
-                :test-result-output)
+                :*test-result-output*)
   (:import-from :prove.report
                 :test-report-p
                 :passed-test-report
@@ -114,7 +114,7 @@
         (incf (failed suite)))
       (incf (test-count suite))
       (when output
-        (format-report (test-result-output) nil report :count (test-count suite)))
+        (format-report *test-result-output* nil report :count (test-count suite)))
       (values result report))))
 
 (defmacro with-duration (((duration result) form) &body body)
@@ -266,7 +266,7 @@
   (let ((report (make-instance 'comment-report
                                :description desc)))
     (add-report report (current-suite))
-    (format-report (test-result-output) nil report)))
+    (format-report *test-result-output* nil report)))
 
 (defun skip (how-many why &rest format-args)
   (check-type how-many integer)
@@ -296,7 +296,7 @@
                                            :got e
                                            :description (format nil "Aborted due to an error in subtest ~S" desc))))
                       (add-report error-report *suite*)
-                      (format-report (test-result-output) nil error-report :count (test-count *suite*))))))
+                      (format-report *test-result-output* nil error-report :count (test-count *suite*))))))
             (make-instance 'composed-test-report
                            :duration (reduce #'+
                                              (remove-if-not #'test-report-p (reports *suite*))
@@ -307,7 +307,7 @@
         (suite (current-suite)))
     (add-report report suite)
     (incf (test-count suite))
-    (format-report (test-result-output) nil report :count (test-count suite))))
+    (format-report *test-result-output* nil report :count (test-count suite))))
 
 (defmacro subtest (desc &body body)
   `(%subtest ,desc (lambda () ,@body)))

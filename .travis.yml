@@ -6,7 +6,6 @@ env:
     - PATH=~/.roswell/bin:$PATH
     - ROSWELL_BRANCH=release
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - COVERAGE_EXCLUDE=t
   matrix:
     - LISP=sbcl-bin
     - LISP=ccl-bin
@@ -20,5 +19,7 @@ install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
 
 script:
+  # prove-asdf must be independent.
+  - ros +Q -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
   - ros -l prove.asd -e '(ql:quickload :prove)'
-  - ros -l prove-asdf.asd -e '(ql:quickload :prove-asdf)'
+  - ros -l cl-test-more.asd -e '(ql:quickload :cl-test-more)'

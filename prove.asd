@@ -10,7 +10,8 @@
   :depends-on (:cl-ppcre
                :cl-ansi-text
                :cl-colors
-               :alexandria)
+               :alexandria
+               :uiop)
   :components ((:module "src"
                 :components
                 ((:file "prove" :depends-on ("output" "test" "suite" "asdf" "color"))

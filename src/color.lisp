@@ -11,7 +11,7 @@
 (in-package :prove.color)
 
 (defvar *enable-colors*
-  (not (equal (asdf::getenv "EMACS") "t"))
+  (not (equal (uiop:getenv "EMACS") "t"))
   "Flag whether colorize a test report. The default is T except on Emacs (SLIME).")
 
 (defmacro with-gray (stream &body body)

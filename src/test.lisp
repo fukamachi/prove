@@ -141,7 +141,7 @@
                (add-report ,report ,suite)
                (incf (failed ,suite))
                (incf (test-count ,suite))
-               (format-report (test-result-output) nil ,report :count (test-count ,suite))))))))
+               (format-report *test-result-output* nil ,report :count (test-count ,suite))))))))
 
 (defmacro ok (test &optional desc)
   (with-gensyms (duration result)

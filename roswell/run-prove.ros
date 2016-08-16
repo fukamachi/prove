@@ -12,6 +12,13 @@ exec ros -Q -- $0 "$@"
 (when (uiop:getenv "COVERALLS")
   (ql:quickload '(:cl-coveralls :split-sequence) :silent t))
 
+(defun print-error (format-string &rest format-args)
+  (format *error-output* "~&[Error] ")
+  (apply #'format *error-output*
+         format-string format-args)
+  (fresh-line *error-output*)
+  (uiop:quit -1))
+
 (defun main (&rest test-files)
   (let (reporter)
     (when (or (string= (first test-files) "-r")
@@ -22,15 +29,16 @@ exec ros -Q -- $0 "$@"
                (not
                 (some #'null
                       (mapcar (lambda (test-file)
-                                (let ((test-file (pathname test-file))
-                                      (prove.output:*default-reporter*
+                                (unless (probe-file test-file)
+                                  (print-error "test file '~A' does not exist." test-file))
+                                (let ((prove.output:*default-reporter*
                                         (or reporter
                                             prove.output:*default-reporter*)))
-                                  (unless (or (probe-file test-file)
-                                              (string= (pathname-type test-file) "asd"))
-                                    (error "~S is not an asd file." test-file))
-                                  (load test-file)
-                                  (prove:run-test-system (asdf:find-system (pathname-name test-file)))))
+                                  (unless (string= (pathname-type (probe-file test-file)) "asd")
+                                    (print-error "test file '~A' is not an asd file." test-file))
+                                  (let ((test-file (probe-file test-file)))
+                                    (load test-file)
+                                    (prove:run-test-system (asdf:find-system (pathname-name test-file))))))
                               test-files)))))
       (or #.(if (uiop:getenv "COVERALLS")
                 `(,(intern (string :with-coveralls) :coveralls)

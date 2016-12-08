@@ -47,7 +47,7 @@
           (format *test-result-output* "~2&Running a test file '~A'~%" (asdf:component-pathname c))
           (restart-case
               (progn
-                (asdf:perform (make-instance 'asdf:load-source-op) c)
+                (asdf:perform (asdf:make-operation 'asdf:load-source-op) c)
                 (unless *last-suite-report*
                   (warn "Test completed without 'finalize'd."))
                 (if (eql (getf *last-suite-report* :failed) 0)

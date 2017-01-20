@@ -1,5 +1,5 @@
 language: common-lisp
-sudo: required
+sudo: false
 
 env:
   global:
@@ -9,17 +9,42 @@ env:
   matrix:
     - LISP=sbcl-bin
     - LISP=ccl-bin
-    - LISP=abcl
-    - LISP=clisp
     - LISP=ecl
+    - LISP=abcl
     - LISP=allegro
     - LISP=cmucl
+    - LISP=clisp
 
+matrix:
+  allow_failures:
+    # there is some issue with clisp,
+    # roswell installs ASDF3, but clisp doesn't see it
+    - env: LISP=clisp
+
+addons:
+  apt:
+    packages:
+      # it is required for some reason
+      # to install allegrocl and cmucl
+      - libc6-i386
+      
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
 
+before_script:
+  - ros --version
+  - ros config
+  - ros -e '(princ (lisp-implementation-type))
+            (terpri)
+            (princ (lisp-implementation-version))
+            (terpri)
+            (princ *features*)
+            (terpri)'
+
+
 script:
   # prove-asdf must be independent.
-  - ros +Q -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
+  - ros +Q -e '(require "asdf")' -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
   - ros -l prove.asd -e '(ql:quickload :prove)'
   - ros -l cl-test-more.asd -e '(ql:quickload :cl-test-more)'
+  - ros -e '(ql:quickload :prove) (uiop:quit (if (prove:run-test-system :prove-test) 0 1))'

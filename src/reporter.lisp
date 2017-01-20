@@ -29,6 +29,10 @@
       (fresh-line destination))
     (with-slots (indent-space) reporter
       (format destination (indent indent-space))
+      ;; if this (?!$) is indended to not insert spaces
+      ;; into empty lines, then (?m) should be inserted
+      ;; before
+      ;; TODO: make a pull-request
       (write-string (ppcre:regex-replace-all "(\\n)(?!$)"
                                              output
                                              (format nil "\\1~A" (indent indent-space)))

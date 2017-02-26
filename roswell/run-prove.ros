@@ -25,10 +25,10 @@ exec ros -Q -- $0 "$@"
               (string= (first test-files) "--reporter"))
       (setf reporter (second test-files)
             test-files (cddr test-files)))
-    (flet ((color-p (arg) (or (string= "-c" arg)
-                              (string= "--without-colors" arg))))
-      (setf color (loop :for a :in test-files :thereis (color-p a))
-            test-files (remove-if #'color-p test-files)))
+    (flet ((not-color-p (arg) (or (string= "-c" arg)
+                                  (string= "--without-colors" arg))))
+      (setf color (not (loop :for a :in test-files :thereis (not-color-p a)))
+            test-files (remove-if #'not-color-p test-files)))
     (labels ((run-tests ()
                (not
                 (some #'null

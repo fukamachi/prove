@@ -20,11 +20,15 @@ exec ros -Q -- $0 "$@"
   (uiop:quit -1))
 
 (defun main (&rest test-files)
-  (let (reporter)
+  (let (reporter color)
     (when (or (string= (first test-files) "-r")
               (string= (first test-files) "--reporter"))
       (setf reporter (second test-files)
             test-files (cddr test-files)))
+    (flet ((color-p (arg) (or (string= "-c" arg)
+                              (string= "--without-colors" arg))))
+      (setf color (loop :for a :in test-files :thereis (color-p a))
+            test-files (remove-if #'color-p test-files)))
     (labels ((run-tests ()
                (not
                 (some #'null
@@ -36,7 +40,8 @@ exec ros -Q -- $0 "$@"
                                             prove.output:*default-reporter*)))
                                   (unless (string= (pathname-type (probe-file test-file)) "asd")
                                     (print-error "test file '~A' is not an asd file." test-file))
-                                  (let ((test-file (probe-file test-file)))
+                                  (let ((test-file (probe-file test-file))
+                                        (prove:*enable-colors* color))
                                     (load test-file)
                                     (prove:run-test-system (asdf:find-system (pathname-name test-file))))))
                               test-files)))))

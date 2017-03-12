@@ -5,7 +5,8 @@
         :prove.reporter)
   (:import-from :prove.color
                 :with-color)
-  (:export :list-reporter))
+  (:export :list-reporter
+           :report-expected-line))
 (in-package :prove.reporter.list)
 
 (defclass list-reporter (reporter) ())
@@ -29,8 +30,12 @@
            (format nil "~A ..." (subseq value 0 96))
            value)))))
 
-(defun report-expected-line (report)
-  (when (typep report 'normal-test-report)
+
+(defgeneric report-expected-line (report)
+  (:documentation "Reports about failed or passed test.
+                   Should return a string with description of what have happened.")
+  
+  (:method ((report normal-test-report))
     (with-slots (got got-form notp report-expected-label expected) report
       (format nil "~A is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~A~:[ (got ~S)~;~*~]"
               (omit-long-value (or got-form got))

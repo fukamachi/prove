@@ -8,7 +8,7 @@
 (setf *default-reporter* :list)
 
 
-(plan 19)
+(plan 22)
 
 (test-assertion "Successful OK"
                 (ok t)
@@ -118,5 +118,49 @@ Subtest
 (test-assertion "If condition type mismatch, \"is-error\" fails"
                 (is-error (error 'my-condition) 'simple-error)
                 "(?s)× \\(ERROR ('MY-CONDITION|\\(QUOTE MY-CONDITION\\))\\) is expected to raise a condition SIMPLE-ERROR \\(got #<(a T.PROVE::)?MY-CONDITION.*>\\)")
+
+
+(test-assertion
+ "All lines of multiline description should be indented"
+ (is 'blah 'blah
+     "Blah with multiline
+description!")
+                "
+✓ Blah with multiline
+  description!")
+
+
+(test-assertion
+ "Multiline indentation should work for nested tests"
+ (subtest "Outer testcase
+with multiline
+description."
+   (is 'blah 'blah
+       "Blah with multiline
+description!")
+  
+   (subtest "Inner testcase
+with multiline description."
+     (is 'foo 'foo
+         "Foo with multiline
+description!")))
+                "
+Outer testcase
+with multiline
+description.
+   ✓ Blah with multiline
+     description! 
+  Inner testcase
+  with multiline description.
+     ✓ Foo with multiline
+       description!")
+
+
+(test-assertion "Check finalize's output without a plan"
+                (finalize)
+                "
+△ Tests were run but no plan was declared.
+✓ 0 tests completed (0ms)")
+
 
 (finalize)

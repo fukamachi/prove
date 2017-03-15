@@ -13,10 +13,11 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report comment-report) &rest args)
   (declare (ignore args))
-  (format/indent reporter stream "~& ")
-  (with-color (:white :stream stream)
-    (princ (slot-value report 'description) stream))
-  (terpri stream))
+  (with-additional-indent (reporter stream "~& ")
+    (with-color (:white :stream stream)
+      (format/indent reporter stream (slot-value report 'description)))
+    (terpri stream)))
+
 
 (defun omit-long-value (value)
   (typecase value
@@ -37,19 +38,25 @@
   
   (:method ((report normal-test-report))
     (with-slots (got got-form notp report-expected-label expected) report
-      (format nil "~A is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~A~:[ (got ~S)~;~*~]"
-              (omit-long-value (or got-form got))
-              notp
-              report-expected-label
-              (omit-long-value expected)
-              (eq got got-form)
-              got))))
+      (escape-tildes
+       (format nil "~A is ~:[~;not ~]expected to ~:[be~;~:*~A~] ~A~:[ (got ~S)~;~*~]"
+               (omit-long-value (or got-form got))
+               notp
+               report-expected-label
+               (omit-long-value expected)
+               (eq got got-form)
+               got)))))
+
+
+(defun escape-tildes (text)
+  (ppcre:regex-replace-all "~" text "~~"))
+
 
 (defun possible-report-description (report)
   (cond
     ((slot-value report 'description)
      (format nil "~A~:[~; (Skipped)~]"
-             (slot-value report 'description)
+             (escape-tildes (slot-value report 'description))
              (skipped-report-p report)))
     (T (report-expected-line report))))
 
@@ -65,60 +72,58 @@
 
 (defmethod format-report (stream (reporter list-reporter) (report normal-test-report) &rest args)
   (declare (ignore args))
-  (format/indent reporter stream "~&  ")
-  (with-color (:green :stream stream)
-    (format stream "✓"))
-  (let ((description (possible-report-description report))
-        (duration (slot-value report 'duration)))
-    (when description
-      (format stream " ")
-      (with-color (:gray :stream stream)
-        (write-string description stream)))
-    (when duration
-      (format stream " ")
-      (print-duration stream duration (slot-value report 'slow-threshold))))
-  (terpri stream))
+  (with-additional-indent (reporter stream "~&  ")
+    (with-color (:green :stream stream)
+      (with-additional-indent (reporter stream "✓ ")
+        (let ((description (possible-report-description report))
+              (duration (slot-value report 'duration)))
+          (when description
+            (with-color (:gray :stream stream)
+              (format/indent reporter stream description)))
+        
+          (when duration
+            (format stream " ")
+            (print-duration stream duration (slot-value report 'slow-threshold))))
+        (terpri stream)))))
 
 (defmethod format-report (stream (reporter list-reporter) (report skipped-test-report) &rest args)
   (declare (ignore args))
-  (format/indent reporter stream "~&  ")
-  (with-color (:cyan :stream stream)
-    (format stream "-")
-    (let ((description (possible-report-description report)))
-      (when description
-        (format stream " ")
-        (write-string description stream))))
-  (terpri stream))
+  (with-additional-indent (reporter stream "~&  ")
+    (with-color (:cyan :stream stream)
+      (with-additional-indent (reporter stream "- ")
+        (let ((description (possible-report-description report)))
+          (when description
+            (format/indent reporter stream description))))
+      (terpri stream))))
 
 (defmethod format-report (stream (reporter list-reporter) (report failed-test-report) &rest args)
   (declare (ignore args))
-  (format/indent reporter stream "~&  ")
-  (with-color (:red :stream stream)
-    (format stream "×")
-    (let ((description (possible-report-description report))
-          (duration (slot-value report 'duration)))
-      (when description
-        (format stream " ")
-        (write-string description stream))
-      (when duration
-        (format stream " ")
-        (print-duration stream duration (slot-value report 'slow-threshold))))
-    (when (slot-value report 'description)
-      (format/indent reporter stream "~&    ")
-      (princ (report-expected-line report) stream)))
-  (terpri stream))
+  (with-additional-indent (reporter stream "~&  ")
+    (with-color (:red :stream stream)
+      (with-additional-indent (reporter stream "× ")
+        (let ((description (possible-report-description report))
+              (duration (slot-value report 'duration)))
+          (when description
+            (format/indent reporter stream description))
+          (when duration
+            (format stream " ")
+            (print-duration stream duration (slot-value report 'slow-threshold))))
+        (when (slot-value report 'description)
+          (format/indent reporter stream
+                         (concatenate 'string "~&" (report-expected-line report)))))
+      (terpri stream))))
 
 (defmethod format-report (stream (reporter list-reporter) (report error-test-report) &rest args)
   (declare (ignore args))
-  (format/indent reporter stream "~&  ")
-  (with-color (:red :stream stream)
-    (format stream "× ")
-    (when (slot-value report 'description)
-      (format stream "~A~%" (slot-value report 'description))
-      (format/indent reporter stream "    "))
-    (format stream "Raised an error ~A (expected: ~S)"
-            (slot-value report 'got)
-            (slot-value report 'expected)))
+  ;; format/indent
+  (with-additional-indent (reporter stream "~&  ")
+    (with-color (:red :stream stream)
+      (with-additional-indent (reporter stream "× ")
+        (when (slot-value report 'description)
+          (format/indent reporter stream "~A~%" (slot-value report 'description)))
+        (format/indent reporter stream "Raised an error ~A (expected: ~S)"
+                       (slot-value report 'got)
+                       (slot-value report 'expected)))))
   (terpri stream))
 
 (defmethod format-report (stream (reporter list-reporter) (report composed-test-report) &rest args)

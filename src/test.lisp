@@ -15,7 +15,8 @@
                 :duration)
   (:import-from :prove.reporter
                 :format-report
-                :*indent-level*)
+                :*indent-level*
+                :*additional-indent*)
   (:import-from :prove.suite
                 :suite
                 :*suite*
@@ -285,7 +286,8 @@
   (diag desc)
   (let ((report
           (let ((*suite* (make-instance 'suite))
-                (*indent-level* (1+ *indent-level*)))
+                (*indent-level* (1+ *indent-level*))
+                (*additional-indent* 0))
             (if *debug-on-error*
                 (funcall body-fn)
                 (handler-case (funcall body-fn)

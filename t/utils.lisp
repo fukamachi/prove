@@ -107,7 +107,8 @@ the result before trying to match."
                        ;; tested assert-that macro from modifying real testsuite.
                        ;; Otherwise it can increment failed or success tests count
                        ;; and prove will output wrong data.
-                       (prove.suite:*suite* (make-instance 'prove.suite:suite)))
+                       (prove.suite:*suite* (make-instance 'prove.suite:suite))
+                       (prove.reporter::*debug-indentation* nil))
                    ,body)))
 
               (,trimmed-result (string-trim '(#\Space #\Newline)

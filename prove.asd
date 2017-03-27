@@ -1,17 +1,12 @@
-(in-package :cl-user)
-(defpackage prove-asd
-  (:use :cl :asdf))
-(in-package :prove-asd)
-
-(defsystem prove
+(defsystem "prove"
   :version "1.0.0"
   :author "Eitaro Fukamachi"
   :license "MIT"
-  :depends-on (:cl-ppcre
-               :cl-ansi-text
-               :cl-colors
-               :alexandria
-               :uiop)
+  :depends-on ("cl-ppcre"
+               "cl-ansi-text"
+               "cl-colors"
+               "alexandria"
+               "uiop")
   :components ((:module "src"
                 :components
                 ((:file "prove" :depends-on ("output" "test" "suite" "asdf" "color"))

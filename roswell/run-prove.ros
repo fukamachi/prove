@@ -42,9 +42,10 @@ exec ros -Q -- $0 "$@"
                                     (print-error "test file '~A' is not an asd file." test-file))
                                   (let ((test-file (probe-file test-file))
                                         (prove:*enable-colors* color))
-                                    (setf (gethash (pathname-name test-file) asdf::*source-registry*)
-                                          test-file)
-                                    (prove:run-test-system (asdf:find-system (pathname-name test-file))))))
+                                    (#+asdf3.3 asdf::with-asdf-session
+                                     #-asdf3.3 asdf::with-asdf-cache ()
+                                      (asdf::load-asd test-file)
+                                      (prove:run-test-system (asdf:find-system (pathname-name test-file)))))))
                               test-files)))))
       (or #.(if (uiop:getenv "COVERALLS")
                 `(,(intern (string :with-coveralls) :coveralls)

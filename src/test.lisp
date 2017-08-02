@@ -147,7 +147,7 @@
 (defmacro ok (test &optional desc)
   (with-gensyms (duration result)
     (once-only (test desc)
-      `(with-catching-errors (:expected T :description ,desc)
+      `(with-catching-errors (:expected t :description ,desc)
          (with-duration ((,duration ,result) ,test)
            (test ,result t ,desc
                  :duration ,duration
@@ -344,7 +344,7 @@
 (defun run-test-package (package-designator)
   (let ((*package* (typecase package-designator
                      (package package-designator)
-                     (T (find-package package-designator)))))
+                     (t (find-package package-designator)))))
     (loop for (name . test-fn) in (reverse (gethash *package* *package-tests*))
           do (funcall test-fn))
     (finalize)))

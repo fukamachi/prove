@@ -132,13 +132,23 @@ Otherwise, all lines except the first one are indented."
 (defclass reporter ()
   ((indent-space :initform 2)))
 
+(defun symbolicate* (names package)
+  (assert (listp names))
+  (let ((*package* (find-package package)))
+    #+allegro
+    (apply #'alexandria:symbolicate (mapcar (lambda (name)
+					      (funcall (ecase excl:*current-case-mode*
+							 (:case-sensitive-lower #'string-downcase)
+							 (:case-insensitive-upper #'string-upcase))
+						       name))
+					    names))
+    #-allegro
+    (apply #'alexandria:symbolicate names)))
+
 (defun find-reporter (name)
   (make-instance
-   (intern (format nil "~:@(~A~)-~A" name #.(string :reporter))
-           (intern (format nil "~A.~:@(~A~)"
-                           #.(string :prove.reporter)
-                           name)
-                   :keyword))))
+   (symbolicate* (list name "-" 'reporter)
+		 (symbolicate* (list 'prove.reporter "." name) 'keyword))))
 
 (defgeneric format-report (stream reporter report &rest args)
   (:method (stream (reporter null) (report report) &rest args)

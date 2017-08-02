@@ -58,7 +58,7 @@
      (format nil "~A~:[~; (Skipped)~]"
              (escape-tildes (slot-value report 'description))
              (skipped-report-p report)))
-    (T (report-expected-line report))))
+    (t (report-expected-line report))))
 
 (defun print-duration (stream duration &optional slow-threshold)
   (let ((color (if slow-threshold

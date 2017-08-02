@@ -21,7 +21,7 @@
         (with-color ((cond
                        ((failed-report-p report) :red)
                        ((skipped-report-p report) :cyan)
-                       (T :gray)) :stream stream)
+                       (t :gray)) :stream stream)
           (format stream (if (error-report-p report)
                              "x"
                              ".")))

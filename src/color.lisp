@@ -27,7 +27,7 @@
      `(if *enable-colors*
           (with-gray ,(or (getf args :stream) t) ,@body)
           (progn ,@body)))
-    (T `(if *enable-colors*
+    (t `(if *enable-colors*
             (if (or (eq ,color :gray)
                     (eq ,color :grey)
                     (eq ,color cl-colors:+gray+)

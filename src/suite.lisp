@@ -57,7 +57,7 @@
 (defun find-package-suite (package-designator)
   (let ((package (typecase package-designator
                    (package package-designator)
-                   (T (find-package package-designator)))))
+                   (t (find-package package-designator)))))
     (or (gethash (package-name package) *defined-suites*)
         (setf (gethash (package-name package) *defined-suites*)
               (make-instance 'package-suite)))))

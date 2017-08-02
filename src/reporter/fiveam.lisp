@@ -30,7 +30,7 @@
                       notp
                       report-expected-label
                       expected))
-      (T (format/indent reporter stream "~& ~:[(no description)~;~:*~A~]: Failed~%"
+      (t (format/indent reporter stream "~& ~:[(no description)~;~:*~A~]: Failed~%"
                         description)))))
 
 (defmethod print-error-report ((reporter fiveam-reporter) (report composed-test-report) stream)

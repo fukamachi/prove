@@ -30,11 +30,12 @@
     (call-next-method)))
 
 (defmethod asdf:perform ((op asdf:load-op) (c test-file))
-  (pushnew c (gethash (asdf:component-system c) *system-test-files*)))
+  (pushnew c (gethash (asdf:component-system c) *system-test-files*)
+           :key #'asdf:component-pathname
+           :test #'equal))
 
 (defun run-test-system (system-designator)
   "Runs a testing ASDF system."
-  (setf (gethash (asdf:find-system system-designator) *system-test-files*) '())
   #+quicklisp (ql:quickload (if (typep system-designator 'asdf:system)
                                 (asdf:component-name system-designator)
                                 system-designator))

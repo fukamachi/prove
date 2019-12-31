@@ -44,7 +44,7 @@ before_script:
 
 script:
   # prove-asdf must be independent.
-  - ros +Q -e '(require "asdf")' -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
-  - ros -l prove.asd -e '(ql:quickload :prove)'
-  - ros -l cl-test-more.asd -e '(ql:quickload :cl-test-more)'
+  - ros +Q -e '(require "asdf")' -e '(asdf:load-asd #P"prove-asdf.asd")' -e '(asdf:load-system :prove-asdf)'
+  - ros -e '(asdf:load-asd #P"prove.asd")' -e '(ql:quickload :prove)'
+  - ros -e '(asdf:load-asd #P"cl-test-more.asd")' -e '(ql:quickload :cl-test-more)'
   - ros -e '(ql:quickload :prove) (uiop:quit (if (prove:run-test-system :prove-test) 0 1))'

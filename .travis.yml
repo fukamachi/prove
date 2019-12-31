@@ -27,9 +27,10 @@ addons:
       # it is required for some reason
       # to install allegrocl and cmucl
       - libc6-i386
-      
+
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - ros install pnathan/cl-ansi-text
 
 before_script:
   - ros --version
@@ -44,7 +45,7 @@ before_script:
 
 script:
   # prove-asdf must be independent.
-  - ros +Q -e '(require "asdf")' -l prove-asdf.asd -e '(asdf:load-system :prove-asdf)'
-  - ros -l prove.asd -e '(ql:quickload :prove)'
-  - ros -l cl-test-more.asd -e '(ql:quickload :cl-test-more)'
+  - ros +Q -e '(require "asdf")' -e '(asdf:load-asd "prove-asdf.asd")' -e '(asdf:load-system :prove-asdf)'
+  - ros -e '(asdf:load-asd "prove.asd")' -e '(ql:quickload :prove)'
+  - ros -e '(asdf:load-asd "cl-test-more.asd")' -e '(ql:quickload :cl-test-more)'
   - ros -e '(ql:quickload :prove) (uiop:quit (if (prove:run-test-system :prove-test) 0 1))'

@@ -2,7 +2,7 @@
 (defpackage prove.color
   (:use :cl)
   (:import-from :cl-ansi-text
-                :generate-color-string)
+                :make-color-string)
   (:import-from :cl-colors
                 :+gray+
                 :+grey+)
@@ -16,9 +16,9 @@
 
 (defmacro with-gray (stream &body body)
   `(progn
-     (format ,stream (cl-ansi-text::generate-color-string 90))
+     (format ,stream (cl-ansi-text:make-color-string 90))
      (unwind-protect (progn ,@body)
-       (format ,stream (cl-ansi-text::generate-color-string 0)))))
+       (format ,stream (cl-ansi-text:make-color-string 0)))))
 
 (defmacro with-color ((color &rest args) &body body)
   (cond

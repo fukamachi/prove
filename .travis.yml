@@ -27,9 +27,10 @@ addons:
       # it is required for some reason
       # to install allegrocl and cmucl
       - libc6-i386
-      
+
 install:
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - ros install pnathan/cl-ansi-text
 
 before_script:
   - ros --version

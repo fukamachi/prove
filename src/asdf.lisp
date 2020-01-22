@@ -78,7 +78,7 @@
   (check-type directory pathname)
   (flet ((always-true (&rest args)
            (declare (ignore args))
-           T))
+           t))
     (let ((directories '()))
       (#+asdf3 uiop:collect-sub*directories
        #-asdf3 asdf::collect-sub*directories
@@ -113,7 +113,7 @@ Example:
          (run (pathname object)))
         ((and (pathnamep object)
               (directory-pathname-p object))
-         (let ((all-passed-p T) (all-passed-files '()) (all-failed-files '()))
+         (let ((all-passed-p t) (all-passed-files '()) (all-failed-files '()))
            (restart-case
                (dolist (file (test-files-in-directory object))
                  (multiple-value-bind (passedp passed-files failed-files)
@@ -137,8 +137,8 @@ Example:
              :report "Skip this test file."
              nil))
          (if (eql (getf *last-suite-report* :failed) 0)
-             (values T (list object) '())
-             (values NIL '() (list object))))
-        (T (run-test-system object))))))
+             (values t (list object) '())
+             (values nil '() (list object))))
+        (t (run-test-system object))))))
 
 (import 'test-file :asdf)
